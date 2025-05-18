@@ -9,7 +9,9 @@ const Checkout = () => {
   }, [newOrderStore.order]);
 
   return (
-    <div className={styles.wrapper}>Total Amount:{newOrderStore.total}</div>
+    <div className={styles.wrapper}>
+      Total Amount: ${newOrderStore.total.toFixed(2)}
+    </div>
   );
 };
 
