@@ -9,7 +9,7 @@ export class CreateStripeCheckoutSessionController {
   async createCheckoutSession(@Body() body) {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      success_url: `${process.env.SITE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.SITE_URL}/payment-success`,
       cancel_url: `${process.env.SITE_URL}/cancel`,
       line_items: body.line_items,
     });
