@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import styles from "./page.module.scss";
 import { commonStore } from "@modules/common/stores";
 import { ProductList } from "@modules/product/components";
+import Checkout from "@modules/product/components/Checkout";
 
 export default function Home() {
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function Home() {
   return (
     <div className={styles.wrapper}>
       <ProductList />
+      <Checkout />
     </div>
   );
 }
