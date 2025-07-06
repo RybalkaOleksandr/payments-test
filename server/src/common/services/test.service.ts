@@ -5,8 +5,6 @@ export class TestService {
   constructor() {}
 
   async getTestData(queryParams: any) {
-    console.log(queryParams);
-
     return {
       totalAmount: 100,
       totalPages: 10,

@@ -7,7 +7,6 @@ import { Checkout, ProductList } from "@modules/product/components";
 
 export default function Home() {
   useEffect(() => {
-    console.log("effect");
     commonStore.reload({
       data: {
         pagination: {

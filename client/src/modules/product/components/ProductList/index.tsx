@@ -1,6 +1,5 @@
 import { Table } from "antd";
 import { observer } from "mobx-react";
-import { products } from "./dataSource";
 import { IProduct } from "@modules/product/types";
 import {
   getDescriptionColumn,
@@ -8,8 +7,14 @@ import {
   getPriceColumn,
   getQuantityColumn,
 } from "./columns";
+import { useEffect } from "react";
+import { productsStore } from "@modules/product/stores";
 
 const ProductList = () => {
+  useEffect(() => {
+    productsStore.reload();
+  }, []);
+
   return (
     <Table
       bordered
@@ -21,7 +26,7 @@ const ProductList = () => {
       ]}
       rowKey={({ id }: IProduct) => id}
       loading={false}
-      dataSource={products || []}
+      dataSource={productsStore.products || []}
       pagination={false}
     />
   );
