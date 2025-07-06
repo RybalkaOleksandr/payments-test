@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import styles from "./page.module.scss";
 import { commonStore } from "@modules/common/stores";
+import { Checkout, ProductList } from "@modules/product/components";
 
 export default function Home() {
   useEffect(() => {
@@ -17,5 +18,10 @@ export default function Home() {
     });
   }, []);
 
-  return <div className={styles.fontLarge}>Initial page</div>;
+  return (
+    <div className={styles.wrapper}>
+      <ProductList />
+      <Checkout />
+    </div>
+  );
 }

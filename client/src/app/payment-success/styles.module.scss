@@ -1,0 +1,21 @@
+.wrapper {
+  margin: 40px;
+}
+
+.top {
+  display: flex;
+}
+
+.text {
+  display: flex;
+  height: 90vh;
+  justify-content: center;
+  align-items: center;
+  font-size: 100px;
+}
+
+.backBtn {
+  height: 50px;
+  font-weight: bold;
+  font-size: 20px;
+}
