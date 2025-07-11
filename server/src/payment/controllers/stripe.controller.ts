@@ -6,6 +6,18 @@ interface IBody {
   line_items: [{ quantity: number; price: string }];
 }
 
+async function calculateTotalAmount(line_items) {
+  let total = 0;
+
+  for (const item of line_items) {
+    const price = await stripe.prices.retrieve(item.price);
+    const unitAmount = price.unit_amount; // cents/pennies
+    total += unitAmount * item.quantity;
+  }
+
+  return total;
+}
+
 @Controller()
 export class CreateStripeCheckoutSessionController {
   constructor() {}
@@ -55,5 +67,16 @@ export class CreateStripeCheckoutSessionController {
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
+  }
+
+  @Post('stripe/payment-intents')
+  async createPaymentIntent(@Body() body: IBody) {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: await calculateTotalAmount(body.line_items),
+      currency: 'usd',
+      automatic_payment_methods: { enabled: true },
+    });
+
+    return paymentIntent.client_secret;
   }
 }
