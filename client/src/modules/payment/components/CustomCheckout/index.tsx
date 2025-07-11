@@ -13,8 +13,13 @@ import { createPaymentIntentStore } from "@modules/payment/stores";
 import { newOrderStore } from "@modules/product/stores";
 import { observer } from "mobx-react";
 import { useRouter } from "next/navigation";
+import { IUserData } from "@modules/payment/types";
 
-const CustomCheckout = () => {
+interface IProps {
+  userData: IUserData;
+}
+
+const CustomCheckout = ({ userData }: IProps) => {
   const router = useRouter();
   const [error, setError] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -42,6 +47,7 @@ const CustomCheckout = () => {
             price: el.priceId,
           };
         }),
+        userData,
       },
       onSuccess: async (clientSecret) => {
         const cardElement = elements.getElement(CardNumberElement);

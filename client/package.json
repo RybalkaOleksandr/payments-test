@@ -23,6 +23,7 @@
     "query-string": "^9.1.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.60.0",
     "sass": "^1.89.0",
     "universal-cookie": "^8.0.1"
   },

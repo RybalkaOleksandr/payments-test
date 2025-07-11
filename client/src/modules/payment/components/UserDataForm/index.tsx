@@ -1,0 +1,80 @@
+import { IUserData } from "@modules/payment/types";
+import { Button, Form, Input } from "antd";
+import { observer } from "mobx-react";
+import { Controller, useForm } from "react-hook-form";
+
+import styles from "./styles.module.scss";
+
+interface IProps {
+  onSubmit: (userData: IUserData) => void;
+}
+
+interface IUserDataForm {
+  name: string;
+  email: string;
+  country: string;
+  postalCode: string;
+}
+
+const UserDataForm = ({ onSubmit }: IProps) => {
+  const { getValues, control } = useForm<IUserDataForm>({
+    mode: "onChange",
+    reValidateMode: "onChange",
+    defaultValues: {
+      name: "",
+      email: "",
+      country: "",
+      postalCode: "",
+    },
+  });
+
+  return (
+    <Form>
+      <Controller
+        control={control}
+        name="name"
+        render={({ field }) => (
+          <Form.Item label="Name">
+            <Input {...field} />
+          </Form.Item>
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="email"
+        render={({ field }) => (
+          <Form.Item label="Email">
+            <Input {...field} />
+          </Form.Item>
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="country"
+        render={({ field }) => (
+          <Form.Item label="Country">
+            <Input {...field} />
+          </Form.Item>
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="postalCode"
+        render={({ field }) => (
+          <Form.Item label="Postal Code">
+            <Input {...field} />
+          </Form.Item>
+        )}
+      />
+
+      <div className={styles.btnWrapper}>
+        <Button onClick={() => onSubmit(getValues())}>Next</Button>
+      </div>
+    </Form>
+  );
+};
+
+export default observer(UserDataForm);

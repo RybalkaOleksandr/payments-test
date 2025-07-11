@@ -3,9 +3,11 @@ import { action, observable, runInAction, makeObservable } from "mobx";
 import { IExecuteStore } from "@modules/common/types";
 import BaseStore from "@utils/BaseStore";
 import { stripeService } from "../services";
+import { IUserData } from "../types";
 
 export type CreatePaymentIntentStoreData = {
   line_items: { quantity: number; price: string }[];
+  userData: IUserData;
 };
 
 class CreatePaymentIntentStore extends BaseStore<CreatePaymentIntentStoreData> {
