@@ -5,7 +5,7 @@ import { Button } from "antd";
 import { createCheckoutSessionStore } from "@modules/payment/stores";
 import { useRouter } from "next/navigation";
 
-const Checkout = () => {
+const CheckoutSession = () => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -39,4 +39,4 @@ const Checkout = () => {
   );
 };
 
-export default observer(Checkout);
+export default observer(CheckoutSession);

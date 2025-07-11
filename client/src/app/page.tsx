@@ -1,8 +1,8 @@
 "use client";
 
+import { CheckoutSession, CustomCheckout } from "@modules/payment/components";
 import styles from "./page.module.scss";
-import { Checkout, ProductList } from "@modules/product/components";
-import CustomCheckout from "@modules/payment/components/CustomCheckout";
+import { ProductList } from "@modules/product/components";
 import TotalAmount from "@modules/product/components/TotalAmount";
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
     <div className={styles.wrapper}>
       <ProductList />
       <TotalAmount />
-      <Checkout />
+      <CheckoutSession />
       <CustomCheckout />
     </div>
   );
