@@ -4,7 +4,7 @@ import { IExecuteStore } from "@modules/common/types";
 import BaseStore from "@utils/BaseStore";
 import { stripeService } from "../services";
 
-type CreateCheckoutSessionStoreData = {
+export type CreateCheckoutSessionStoreData = {
   line_items: { quantity: number; price: string }[];
 };
 

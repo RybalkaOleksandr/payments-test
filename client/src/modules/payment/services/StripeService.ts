@@ -1,7 +1,10 @@
 import { ownApi } from "@utils/axios";
+import { CreateCheckoutSessionStoreData } from "../stores/CreateCheckoutSessionStore";
 
 class StripeService {
-  public createCheckoutSession = async (params: any): Promise<any> => {
+  public createCheckoutSession = async (
+    params: CreateCheckoutSessionStoreData
+  ): Promise<any> => {
     try {
       const { data } = await ownApi.post("stripe/checkout-sessions", params);
 

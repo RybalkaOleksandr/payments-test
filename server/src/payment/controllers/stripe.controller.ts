@@ -2,12 +2,16 @@ import { Controller, Post, Body, Req, RawBodyRequest } from '@nestjs/common';
 import { stripe } from 'src/clients';
 import { Request } from 'express';
 
+interface IBody {
+  line_items: [{ quantity: number; price: string }];
+}
+
 @Controller()
 export class CreateStripeCheckoutSessionController {
   constructor() {}
 
   @Post('stripe/checkout-sessions')
-  async createCheckoutSession(@Body() body) {
+  async createCheckoutSession(@Body() body: IBody) {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       success_url: `${process.env.SITE_URL}/payment-success`,
