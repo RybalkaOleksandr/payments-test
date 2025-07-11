@@ -29,10 +29,9 @@ const Checkout = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.subWrapper}>
-        <div>Total Amount: ${newOrderStore.total.toFixed(2)}</div>
         <div>
           <Button className={styles.checkoutBtn} onClick={handleClick}>
-            Checkout
+            Checkout Session
           </Button>
         </div>
       </div>
