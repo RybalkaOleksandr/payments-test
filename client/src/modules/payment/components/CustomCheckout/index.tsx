@@ -2,19 +2,68 @@ import {
   CardCvcElement,
   CardExpiryElement,
   CardNumberElement,
+  useElements,
+  useStripe,
 } from "@stripe/react-stripe-js";
 import { Button } from "antd";
 import { useState } from "react";
 
 import styles from "./styles.module.scss";
+import { createPaymentIntentStore } from "@modules/payment/stores";
+import { newOrderStore } from "@modules/product/stores";
+import { observer } from "mobx-react";
+import { useRouter } from "next/navigation";
 
 const CustomCheckout = () => {
-  const [error, setError] = useState(null);
+  const router = useRouter();
+  const [error, setError] = useState("");
   const [processing, setProcessing] = useState(false);
+
+  const stripe = useStripe();
+  const elements = useElements();
 
   const cardHandleChange = (event: any) => {
     const { error } = event;
     setError(error ? error.message : "");
+  };
+
+  const handleSubmit = async () => {
+    if (!stripe || !elements || !newOrderStore.order?.products) {
+      return;
+    }
+
+    setProcessing(true);
+
+    createPaymentIntentStore.execute({
+      data: {
+        line_items: newOrderStore.order.products.map((el) => {
+          return {
+            quantity: el.quantity,
+            price: el.priceId,
+          };
+        }),
+      },
+      onSuccess: async (clientSecret) => {
+        const cardElement = elements.getElement(CardNumberElement);
+
+        const payload = await stripe?.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: cardElement!,
+          },
+        });
+
+        setProcessing(false);
+
+        if (payload?.error?.message) {
+          setError(payload.error.message);
+        } else {
+          router.push("/payment-success");
+        }
+      },
+      onError: () => {
+        setProcessing(false);
+      },
+    });
   };
 
   const cardStyle = {
@@ -58,7 +107,13 @@ const CustomCheckout = () => {
           />
         </div>
 
-        <Button disabled={processing}>
+        <Button
+          disabled={
+            !!error || !stripe || !elements || !newOrderStore.order?.products
+          }
+          loading={processing}
+          onClick={handleSubmit}
+        >
           {processing ? "PROCESSING" : "PAY"}
         </Button>
         {error && <p className={styles.errorMessage}>{error}</p>}
@@ -67,4 +122,4 @@ const CustomCheckout = () => {
   );
 };
 
-export default CustomCheckout;
+export default observer(CustomCheckout);
