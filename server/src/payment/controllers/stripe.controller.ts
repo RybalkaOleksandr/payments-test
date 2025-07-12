@@ -2,6 +2,7 @@ import { Controller, Post, Body, Req, RawBodyRequest } from '@nestjs/common';
 import { stripe } from 'src/clients';
 import { Request } from 'express';
 import { delay } from 'src/common/helpers';
+import { UserService } from 'src/user/services/user.service';
 
 interface IBody {
   line_items: [{ quantity: number; price: string }];
@@ -30,7 +31,7 @@ async function calculateTotalAmount(line_items) {
 
 @Controller()
 export class CreateStripeCheckoutSessionController {
-  constructor() {}
+  constructor(private readonly userService: UserService) {}
 
   @Post('stripe/checkout-sessions')
   async createCheckoutSession(@Body() body: IBody) {
@@ -98,5 +99,17 @@ export class CreateStripeCheckoutSessionController {
     await delay(5000);
 
     return paymentIntent.client_secret;
+  }
+
+  @Post('stripe/setup-intents')
+  async createSetupIntent(@Body() body) {
+    const user = await this.userService.findOne(body.userId);
+
+    const setupIntent = await stripe.setupIntents.create({
+      customer: user.stripeCustomerId,
+      payment_method_types: ['card'],
+    });
+
+    return setupIntent.client_secret;
   }
 }
