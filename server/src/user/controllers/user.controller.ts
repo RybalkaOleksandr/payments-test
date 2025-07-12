@@ -29,20 +29,6 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get('count')
-  async count(): Promise<{ count: number }> {
-    const count = await this.userService.count();
-    return { count };
-  }
-
-  @Get('search')
-  async search(@Query('q') query: string): Promise<IUser[]> {
-    if (!query) {
-      return this.userService.findAll();
-    }
-    return this.userService.search(query);
-  }
-
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<IUser> {
     return this.userService.findOne(id);
@@ -59,11 +45,5 @@ export class UserController {
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     return this.userService.remove(id);
-  }
-
-  @Post('reload')
-  async reload(): Promise<{ message: string }> {
-    await this.userService.reloadFromFile();
-    return { message: 'Users data reloaded successfully' };
   }
 }
