@@ -15,7 +15,7 @@ const SelectUser: React.FC = () => {
   };
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("ru-RU", {
+    return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
