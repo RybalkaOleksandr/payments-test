@@ -148,33 +148,4 @@ ${usersString}
   private generateId(): string {
     return Date.now().toString() + Math.random().toString(36).substr(2, 9);
   }
-
-  async count(): Promise<number> {
-    return this.userStorage.length;
-  }
-
-  async search(query: string): Promise<IUser[]> {
-    const lowercaseQuery = query.toLowerCase();
-
-    return this.userStorage.filter(
-      (user) =>
-        user.firstName.toLowerCase().includes(lowercaseQuery) ||
-        user.lastName.toLowerCase().includes(lowercaseQuery) ||
-        user.email.toLowerCase().includes(lowercaseQuery) ||
-        (user.phone && user.phone.includes(query)),
-    );
-  }
-
-  // Метод для перезагрузки данных из файла
-  async reloadFromFile(): Promise<void> {
-    try {
-      // Динамически импортируем файл для получения обновленных данных
-      delete require.cache[require.resolve('../users')];
-      const { users: updatedUsers } = await import('../users');
-      this.userStorage = [...updatedUsers];
-    } catch (error) {
-      console.error('Error reloading users from file:', error);
-      throw new Error('Failed to reload users from file');
-    }
-  }
 }

@@ -4,6 +4,7 @@ export interface IUser {
   firstName: string;
   lastName: string;
   phone?: string;
+  stripeCustomerId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
