@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PaymentModule } from './payment/payment.module';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -12,6 +13,9 @@ import { UserModule } from './user/user.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
+    MongooseModule.forRoot(
+      `mongodb+srv://sasharybalka100500:aMcVsanxYxrM8rVA@cluster0.zl48m.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`,
+    ),
     PaymentModule,
     ProductModule,
     UserModule,

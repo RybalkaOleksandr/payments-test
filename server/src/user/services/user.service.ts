@@ -3,89 +3,48 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { IUser } from '../types';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User, UserDocument } from '../schemas/user.schema';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import * as fs from 'fs';
-import * as path from 'path';
-import { users } from '../users';
 import { stripe } from 'src/clients';
 
 @Injectable()
 export class UserService {
-  private userStorage: IUser[] = [...users];
-  private readonly usersFilePath = path.join(__dirname, '../users.ts');
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  private async saveToFile(): Promise<void> {
-    const usersString = this.userStorage
-      .map(
-        (user) => `  {
-    id: '${user.id}',
-    email: '${user.email}',
-    firstName: '${user.firstName}',
-    lastName: '${user.lastName}',
-    phone: '${user.phone || ''}',
-    createdAt: new Date('${user.createdAt.toISOString()}'),
-    updatedAt: new Date('${user.updatedAt.toISOString()}'),
-  }`,
-      )
-      .join(',\n');
-
-    const fileContent = `import { IUser } from './types';
-
-export const users: IUser[] = [
-${usersString}
-];
-`;
-
-    try {
-      await fs.promises.writeFile(this.usersFilePath, fileContent, 'utf8');
-    } catch (error) {
-      console.error('Error saving users to file:', error);
-      throw new Error('Failed to save users to file');
-    }
-  }
-
-  async create(createUserDto: CreateUserDto): Promise<IUser> {
-    const existingUser = this.userStorage.find(
-      (user) => user.email === createUserDto.email,
-    );
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    // Проверяем, существует ли пользователь с таким email
+    const existingUser = await this.userModel.findOne({
+      email: createUserDto.email,
+    });
 
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
 
-    const newUser: IUser = {
-      id: this.generateId(),
-      ...createUserDto,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
+    // Создаем Stripe клиента
     const stripeCustomer = await stripe.customers.create({
-      email: newUser.email,
-      name: `${newUser.firstName} ${newUser.lastName}`,
-      metadata: {
-        userId: newUser.id,
-      },
+      email: createUserDto.email,
+      name: `${createUserDto.firstName} ${createUserDto.lastName}`,
     });
 
-    this.userStorage.push({
-      ...newUser,
+    // Создаем пользователя в MongoDB
+    const newUser = new this.userModel({
+      ...createUserDto,
       stripeCustomerId: stripeCustomer.id,
     });
 
-    await this.saveToFile();
-
-    return newUser;
+    return await newUser.save();
   }
 
-  async findAll(): Promise<IUser[]> {
-    return this.userStorage;
+  async findAll(): Promise<User[]> {
+    return await this.userModel.find().exec();
   }
 
-  async findOne(id: string): Promise<IUser> {
-    const user = this.userStorage.find((user) => user.id === id);
+  async findOne(id: string): Promise<User> {
+    const user = await this.userModel.findById(id).exec();
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -94,58 +53,86 @@ ${usersString}
     return user;
   }
 
-  async findByEmail(email: string): Promise<IUser | null> {
-    const user = this.userStorage.find((user) => user.email === email);
-    return user || null;
+  async findByEmail(email: string): Promise<User | null> {
+    return await this.userModel.findOne({ email }).exec();
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<IUser> {
-    const userIndex = this.userStorage.findIndex((user) => user.id === id);
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.userModel.findById(id).exec();
 
-    if (userIndex === -1) {
+    if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
+    // Проверяем, не занят ли email другим пользователем
     if (updateUserDto.email) {
-      const existingUser = this.userStorage.find(
-        (user) => user.email === updateUserDto.email && user.id !== id,
-      );
+      const existingUser = await this.userModel.findOne({
+        email: updateUserDto.email,
+        _id: { $ne: id },
+      });
 
       if (existingUser) {
         throw new ConflictException('User with this email already exists');
       }
     }
 
-    const updatedUser: IUser = {
-      ...this.userStorage[userIndex],
-      ...updateUserDto,
-      updatedAt: new Date(),
-    };
+    // Обновляем Stripe клиента если есть изменения
+    if (
+      user.stripeCustomerId &&
+      (updateUserDto.email || updateUserDto.firstName || updateUserDto.lastName)
+    ) {
+      await stripe.customers.update(user.stripeCustomerId, {
+        ...(updateUserDto.email && { email: updateUserDto.email }),
+        ...((updateUserDto.firstName || updateUserDto.lastName) && {
+          name: `${updateUserDto.firstName || user.firstName} ${updateUserDto.lastName || user.lastName}`,
+        }),
+      });
+    }
 
-    await stripe.customers.update(updatedUser.stripeCustomerId, {
-      ...(updateUserDto.email && { email: updateUserDto.email }),
-      ...(updateUserDto.firstName && {
-        name: `${updateUserDto.firstName} ${updateUserDto.lastName}`,
-      }),
-    });
+    // Обновляем пользователя в MongoDB
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .exec();
 
-    this.userStorage[userIndex] = updatedUser;
-    await this.saveToFile();
     return updatedUser;
   }
 
   async remove(id: string): Promise<void> {
-    const userIndex = this.userStorage.findIndex((user) => user.id === id);
+    const user = await this.userModel.findById(id).exec();
 
-    if (userIndex === -1) {
+    if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    this.userStorage.splice(userIndex, 1);
-    await this.saveToFile();
+    // Удаляем Stripe клиента если он существует
+    if (user.stripeCustomerId) {
+      try {
+        await stripe.customers.del(user.stripeCustomerId);
+      } catch (error) {
+        console.error('Error deleting Stripe customer:', error);
+      }
+    }
+
+    // Удаляем пользователя из MongoDB
+    await this.userModel.findByIdAndDelete(id).exec();
   }
 
-  private generateId(): string {
-    return Date.now().toString() + Math.random().toString(36).substr(2, 9);
+  async count(): Promise<number> {
+    return await this.userModel.countDocuments().exec();
+  }
+
+  async search(query: string): Promise<User[]> {
+    const regex = new RegExp(query, 'i');
+
+    return await this.userModel
+      .find({
+        $or: [
+          { firstName: regex },
+          { lastName: regex },
+          { email: regex },
+          { phone: regex },
+        ],
+      })
+      .exec();
   }
 }
