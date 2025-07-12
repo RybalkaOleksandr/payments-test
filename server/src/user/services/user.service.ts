@@ -9,6 +9,7 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { users } from '../users';
+import { stripe } from 'src/clients';
 
 @Injectable()
 export class UserService {
@@ -61,8 +62,21 @@ ${usersString}
       updatedAt: new Date(),
     };
 
-    this.userStorage.push(newUser);
+    const stripeCustomer = await stripe.customers.create({
+      email: newUser.email,
+      name: `${newUser.firstName} ${newUser.lastName}`,
+      metadata: {
+        userId: newUser.id,
+      },
+    });
+
+    this.userStorage.push({
+      ...newUser,
+      stripeCustomerId: stripeCustomer.id,
+    });
+
     await this.saveToFile();
+
     return newUser;
   }
 
@@ -107,6 +121,13 @@ ${usersString}
       ...updateUserDto,
       updatedAt: new Date(),
     };
+
+    await stripe.customers.update(updatedUser.stripeCustomerId, {
+      ...(updateUserDto.email && { email: updateUserDto.email }),
+      ...(updateUserDto.firstName && {
+        name: `${updateUserDto.firstName} ${updateUserDto.lastName}`,
+      }),
+    });
 
     this.userStorage[userIndex] = updatedUser;
     await this.saveToFile();
