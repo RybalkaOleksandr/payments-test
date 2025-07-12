@@ -13,6 +13,18 @@ class StripeService {
       throw new Error(error.message);
     }
   };
+
+  public createPaymentIntent = async (
+    params: CreateCheckoutSessionStoreData
+  ): Promise<any> => {
+    try {
+      const { data } = await ownApi.post("stripe/payment-intents", params);
+
+      return data;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  };
 }
 
 export default new StripeService();

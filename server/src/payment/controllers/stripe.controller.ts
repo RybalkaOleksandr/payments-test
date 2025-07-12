@@ -1,9 +1,31 @@
 import { Controller, Post, Body, Req, RawBodyRequest } from '@nestjs/common';
 import { stripe } from 'src/clients';
 import { Request } from 'express';
+import { delay } from 'src/common/helpers';
 
 interface IBody {
   line_items: [{ quantity: number; price: string }];
+}
+
+interface ICreatePaymentIntentBody extends IBody {
+  userData: {
+    name: string;
+    email: string;
+    country: string;
+    postalCode: string;
+  };
+}
+
+async function calculateTotalAmount(line_items) {
+  let total = 0;
+
+  for (const item of line_items) {
+    const price = await stripe.prices.retrieve(item.price);
+    const unitAmount = price.unit_amount; // cents/pennies
+    total += unitAmount * item.quantity;
+  }
+
+  return total;
 }
 
 @Controller()
@@ -55,5 +77,26 @@ export class CreateStripeCheckoutSessionController {
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
+  }
+
+  @Post('stripe/payment-intents')
+  async createPaymentIntent(@Body() body: ICreatePaymentIntentBody) {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: await calculateTotalAmount(body.line_items),
+      currency: 'usd',
+      automatic_payment_methods: { enabled: true },
+      receipt_email: body.userData.email,
+      shipping: {
+        name: body.userData.name,
+        address: {
+          country: body.userData.country,
+          postal_code: body.userData.postalCode,
+        },
+      },
+    });
+
+    await delay(5000);
+
+    return paymentIntent.client_secret;
   }
 }

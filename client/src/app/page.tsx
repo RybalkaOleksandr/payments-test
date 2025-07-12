@@ -1,26 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { CheckoutSession } from "@modules/payment/components";
 import styles from "./page.module.scss";
-import { commonStore } from "@modules/common/stores";
-import { Checkout, ProductList } from "@modules/product/components";
+import { ProductList } from "@modules/product/components";
+import TotalAmount from "@modules/product/components/TotalAmount";
+import CustomCheckoutBtn from "@modules/payment/components/CustomCheckoutBtn";
 
 export default function Home() {
-  useEffect(() => {
-    commonStore.reload({
-      data: {
-        pagination: {
-          pageSize: 1,
-          current: 1,
-        },
-      },
-    });
-  }, []);
-
   return (
     <div className={styles.wrapper}>
       <ProductList />
-      <Checkout />
+      <TotalAmount />
+      <CheckoutSession />
+      <CustomCheckoutBtn />
     </div>
   );
 }
