@@ -5,13 +5,15 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { Button, Switch } from "antd";
+import { Button, Select, Switch } from "antd";
 import { useState } from "react";
 
 import styles from "./styles.module.scss";
 import {
   createPaymentIntentStore,
   createSetupIntentStore,
+  currentPaymentMethodStore,
+  paymentMethodsStore,
 } from "@modules/payment/stores";
 import { newOrderStore } from "@modules/product/stores";
 import { observer } from "mobx-react";
@@ -115,50 +117,81 @@ const CustomCheckout = ({ userData }: IProps) => {
   };
 
   return (
-    <div className={styles.cardFormWrapper}>
-      <div className={styles.cardForm}>
-        <h1 className={styles.cardFormTitle}>Enter Payment Details</h1>
+    <div className={styles.wrapper}>
+      <div className={styles.existingCardWrapper}>
+        <Select
+          className={styles.existingCardSelect}
+          options={paymentMethodsStore.paymentMethods.map((method) => ({
+            label:
+              method.card?.brand +
+              " **** **** **** " +
+              method.card?.last4 +
+              " | " +
+              method.card?.exp_month +
+              "/" +
+              method.card?.exp_year,
+            value: method.id,
+          }))}
+          onSelect={(value) => {
+            currentPaymentMethodStore.setCurrentPaymentMethod(
+              paymentMethodsStore.paymentMethods.find(
+                (method) => method.id === value
+              )
+            );
+          }}
+          placeholder="Select Payment Method"
+        />
 
-        <div className={styles.cardFormElementsWrapper}>
-          <CardNumberElement
-            className={styles.cardElement}
-            options={cardStyle}
-            onChange={cardHandleChange}
-          />
-          <CardExpiryElement
-            className={styles.cardElement}
-            options={cardStyle}
-            onChange={cardHandleChange}
-          />
-          <CardCvcElement
-            className={styles.cardElement}
-            options={cardStyle}
-            onChange={cardHandleChange}
-          />
-        </div>
+        <Button disabled={processing} onClick={() => {}}>
+          {processing ? "PROCESSING" : "PAY WITH EXISTING CARD"}
+        </Button>
+      </div>
+      OR
+      <div className={styles.cardFormWrapper}>
+        <div className={styles.cardForm}>
+          <h1 className={styles.cardFormTitle}>Enter Payment Details</h1>
 
-        {currentUserStore.currentUser && (
-          <div className={styles.saveCardWrapper}>
-            <label>Save Card</label>
-            <Switch
-              checked={saveCard}
-              onChange={() => {
-                setSaveCard(!saveCard);
-              }}
+          <div className={styles.cardFormElementsWrapper}>
+            <CardNumberElement
+              className={styles.cardElement}
+              options={cardStyle}
+              onChange={cardHandleChange}
+            />
+            <CardExpiryElement
+              className={styles.cardElement}
+              options={cardStyle}
+              onChange={cardHandleChange}
+            />
+            <CardCvcElement
+              className={styles.cardElement}
+              options={cardStyle}
+              onChange={cardHandleChange}
             />
           </div>
-        )}
 
-        <Button
-          disabled={
-            !!error || !stripe || !elements || !newOrderStore.order?.products
-          }
-          loading={processing}
-          onClick={handleSubmit}
-        >
-          {processing ? "PROCESSING" : "PAY"}
-        </Button>
-        {error && <p className={styles.errorMessage}>{error}</p>}
+          {currentUserStore.currentUser && (
+            <div className={styles.saveCardWrapper}>
+              <label>Save Card</label>
+              <Switch
+                checked={saveCard}
+                onChange={() => {
+                  setSaveCard(!saveCard);
+                }}
+              />
+            </div>
+          )}
+
+          <Button
+            disabled={
+              !!error || !stripe || !elements || !newOrderStore.order?.products
+            }
+            loading={processing}
+            onClick={handleSubmit}
+          >
+            {processing ? "PROCESSING" : "PAY"}
+          </Button>
+          {error && <p className={styles.errorMessage}>{error}</p>}
+        </div>
       </div>
     </div>
   );
