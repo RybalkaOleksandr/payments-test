@@ -19,6 +19,9 @@ export class User {
 
   @Prop()
   stripeCustomerId?: string;
+
+  @Prop({ required: true, unique: true })
+  id: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

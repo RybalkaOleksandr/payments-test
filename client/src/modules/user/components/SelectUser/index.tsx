@@ -4,6 +4,7 @@ import { usersStore } from "../../stores";
 import { currentUserStore } from "../../stores";
 import { IUser } from "../../types";
 import styles from "./styles.module.scss";
+import { paymentMethodsStore } from "@modules/payment/stores";
 
 const SelectUser: React.FC = () => {
   useEffect(() => {
@@ -12,6 +13,10 @@ const SelectUser: React.FC = () => {
 
   const handleUserSelect = (user: IUser) => {
     currentUserStore.setCurrentUser(user);
+
+    paymentMethodsStore.load({
+      data: { customerId: user.id },
+    });
   };
 
   const formatDate = (date: Date) => {

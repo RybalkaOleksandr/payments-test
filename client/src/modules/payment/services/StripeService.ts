@@ -25,6 +25,22 @@ class StripeService {
       throw new Error(error.message);
     }
   };
+
+  public getPaymentMethods = async (
+    { customerId }: { customerId: string },
+    ownApiOptions: any
+  ): Promise<any> => {
+    try {
+      const { data } = await ownApi.get(
+        `stripe/${customerId}/payment-methods`,
+        ownApiOptions
+      );
+
+      return data;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  };
 }
 
 export default new StripeService();
