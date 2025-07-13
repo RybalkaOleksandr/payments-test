@@ -7,7 +7,8 @@ import { IUserData } from "../types";
 
 export type CreatePaymentIntentStoreData = {
   line_items: { quantity: number; price: string }[];
-  userData: IUserData;
+  userData?: IUserData;
+  customerId?: string;
 };
 
 class CreatePaymentIntentStore extends BaseStore<CreatePaymentIntentStoreData> {

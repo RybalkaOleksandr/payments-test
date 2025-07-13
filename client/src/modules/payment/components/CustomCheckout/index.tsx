@@ -39,7 +39,7 @@ const CustomCheckout = ({ userData }: IProps) => {
     setError(error ? error.message : "");
   };
 
-  const handleSubmit = async () => {
+  const checkoutWithNewCard = async () => {
     if (!stripe || !elements || !newOrderStore.order?.products) {
       return;
     }
@@ -98,6 +98,48 @@ const CustomCheckout = ({ userData }: IProps) => {
     });
   };
 
+  const checkoutWithExistingCard = async () => {
+    if (
+      !stripe ||
+      !elements ||
+      !newOrderStore.order?.products ||
+      !currentPaymentMethodStore.currentPaymentMethod
+    ) {
+      return;
+    }
+
+    setProcessing(true);
+
+    createPaymentIntentStore.execute({
+      data: {
+        line_items: newOrderStore.order.products.map((el) => {
+          return {
+            quantity: el.quantity,
+            price: el.priceId,
+          };
+        }),
+        customerId: currentUserStore.currentUser?.id,
+      },
+      onSuccess: async ({ clientSecret }) => {
+        console.log(currentPaymentMethodStore.currentPaymentMethod);
+        const payload = await stripe?.confirmCardPayment(clientSecret, {
+          payment_method: currentPaymentMethodStore.currentPaymentMethod.id,
+        });
+
+        setProcessing(false);
+
+        if (payload?.error?.message) {
+          setError(payload.error.message);
+        } else {
+          router.push("/payment-success");
+        }
+      },
+      onError: () => {
+        setProcessing(false);
+      },
+    });
+  };
+
   const cardStyle = {
     style: {
       base: {
@@ -142,7 +184,7 @@ const CustomCheckout = ({ userData }: IProps) => {
           placeholder="Select Payment Method"
         />
 
-        <Button disabled={processing} onClick={() => {}}>
+        <Button disabled={processing} onClick={checkoutWithExistingCard}>
           {processing ? "PROCESSING" : "PAY WITH EXISTING CARD"}
         </Button>
       </div>
@@ -186,7 +228,7 @@ const CustomCheckout = ({ userData }: IProps) => {
               !!error || !stripe || !elements || !newOrderStore.order?.products
             }
             loading={processing}
-            onClick={handleSubmit}
+            onClick={checkoutWithNewCard}
           >
             {processing ? "PROCESSING" : "PAY"}
           </Button>

@@ -19,7 +19,8 @@ interface IBody {
 }
 
 interface ICreatePaymentIntentBody extends IBody {
-  userData: {
+  customerId?: string;
+  userData?: {
     name: string;
     email: string;
     country: string;
@@ -92,18 +93,27 @@ export class CreateStripeCheckoutSessionController {
 
   @Post('stripe/payment-intents')
   async createPaymentIntent(@Body() body: ICreatePaymentIntentBody) {
+    const stripeCustomerId = body.customerId
+      ? (await this.userService.findOne(body.customerId)).stripeCustomerId
+      : null;
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: await calculateTotalAmount(body.line_items),
       currency: 'usd',
       automatic_payment_methods: { enabled: true },
-      receipt_email: body.userData.email,
-      shipping: {
-        name: body.userData.name,
-        address: {
-          country: body.userData.country,
-          postal_code: body.userData.postalCode,
+      ...(body.customerId && {
+        customer: stripeCustomerId,
+      }),
+      ...(body.userData && {
+        receipt_email: body.userData.email,
+        shipping: {
+          name: body.userData.name,
+          address: {
+            country: body.userData.country,
+            postal_code: body.userData.postalCode,
+          },
         },
-      },
+      }),
     });
 
     await delay(5000);
