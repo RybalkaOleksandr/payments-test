@@ -5,15 +5,19 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { Button } from "antd";
+import { Button, Switch } from "antd";
 import { useState } from "react";
 
 import styles from "./styles.module.scss";
-import { createPaymentIntentStore } from "@modules/payment/stores";
+import {
+  createPaymentIntentStore,
+  createSetupIntentStore,
+} from "@modules/payment/stores";
 import { newOrderStore } from "@modules/product/stores";
 import { observer } from "mobx-react";
 import { useRouter } from "next/navigation";
 import { IUserData } from "@modules/payment/types";
+import { currentUserStore } from "@modules/user/stores";
 
 interface IProps {
   userData: IUserData;
@@ -23,6 +27,7 @@ const CustomCheckout = ({ userData }: IProps) => {
   const router = useRouter();
   const [error, setError] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [saveCard, setSaveCard] = useState(false);
 
   const stripe = useStripe();
   const elements = useElements();
@@ -49,7 +54,15 @@ const CustomCheckout = ({ userData }: IProps) => {
         }),
         userData,
       },
-      onSuccess: async (clientSecret) => {
+      onSuccess: async ({ clientSecret }) => {
+        if (saveCard && currentUserStore.currentUser) {
+          await createSetupIntentStore.execute({
+            data: {
+              userId: currentUserStore.currentUser.id,
+            },
+          });
+        }
+
         const cardElement = elements.getElement(CardNumberElement);
 
         const payload = await stripe?.confirmCardPayment(clientSecret, {
@@ -63,6 +76,17 @@ const CustomCheckout = ({ userData }: IProps) => {
         if (payload?.error?.message) {
           setError(payload.error.message);
         } else {
+          if (saveCard && createSetupIntentStore.clientSecret) {
+            await stripe?.confirmCardSetup(
+              createSetupIntentStore.clientSecret,
+              {
+                payment_method: {
+                  card: cardElement!,
+                },
+              }
+            );
+          }
+
           router.push("/payment-success");
         }
       },
@@ -112,6 +136,18 @@ const CustomCheckout = ({ userData }: IProps) => {
             onChange={cardHandleChange}
           />
         </div>
+
+        {currentUserStore.currentUser && (
+          <div className={styles.saveCardWrapper}>
+            <label>Save Card</label>
+            <Switch
+              checked={saveCard}
+              onChange={() => {
+                setSaveCard(!saveCard);
+              }}
+            />
+          </div>
+        )}
 
         <Button
           disabled={
