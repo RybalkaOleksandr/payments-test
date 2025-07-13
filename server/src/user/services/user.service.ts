@@ -9,6 +9,7 @@ import { User, UserDocument } from '../schemas/user.schema';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { stripe } from 'src/clients';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class UserService {
@@ -33,6 +34,7 @@ export class UserService {
     // Создаем пользователя в MongoDB
     const newUser = new this.userModel({
       ...createUserDto,
+      id: randomUUID(),
       stripeCustomerId: stripeCustomer.id,
     });
 
