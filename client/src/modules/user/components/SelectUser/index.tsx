@@ -14,7 +14,7 @@ const SelectUser: React.FC = () => {
   const handleUserSelect = (user: IUser) => {
     currentUserStore.setCurrentUser(user);
 
-    paymentMethodsStore.load({
+    paymentMethodsStore.reload({
       data: { customerId: user.id },
     });
   };
