@@ -1,4 +1,14 @@
-import { Controller, Post, Body, Req, RawBodyRequest } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Req,
+  RawBodyRequest,
+  Get,
+  Query,
+  Param,
+  Patch,
+} from '@nestjs/common';
 import { stripe } from 'src/clients';
 import { Request } from 'express';
 import { delay } from 'src/common/helpers';
@@ -98,7 +108,10 @@ export class CreateStripeCheckoutSessionController {
 
     await delay(5000);
 
-    return paymentIntent.client_secret;
+    return {
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
+    };
   }
 
   @Post('stripe/setup-intents')
@@ -111,5 +124,30 @@ export class CreateStripeCheckoutSessionController {
     });
 
     return setupIntent.client_secret;
+  }
+
+  @Get('stripe/:customerId/payment-methods')
+  async getPaymentMethods(@Param('customerId') customerId: string) {
+    const user = await this.userService.findOne(customerId);
+
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: user.stripeCustomerId,
+      type: 'card',
+    });
+
+    return paymentMethods.data;
+  }
+
+  @Patch('stripe/payment-intents/:paymentIntentId')
+  async updatePaymentIntent(
+    @Param('paymentIntentId') paymentIntentId: string,
+    @Body() body,
+  ) {
+    const paymentIntent = await stripe.paymentIntents.update(
+      paymentIntentId,
+      body,
+    );
+
+    return paymentIntent.client_secret;
   }
 }
