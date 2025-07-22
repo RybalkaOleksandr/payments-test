@@ -1,14 +1,26 @@
-import { Controller, Post, Body, Req, RawBodyRequest } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Req,
+  RawBodyRequest,
+  Get,
+  Query,
+  Param,
+  Patch,
+} from '@nestjs/common';
 import { stripe } from 'src/clients';
 import { Request } from 'express';
 import { delay } from 'src/common/helpers';
+import { UserService } from 'src/user/services/user.service';
 
 interface IBody {
   line_items: [{ quantity: number; price: string }];
 }
 
 interface ICreatePaymentIntentBody extends IBody {
-  userData: {
+  customerId?: string;
+  userData?: {
     name: string;
     email: string;
     country: string;
@@ -30,7 +42,7 @@ async function calculateTotalAmount(line_items) {
 
 @Controller()
 export class CreateStripeCheckoutSessionController {
-  constructor() {}
+  constructor(private readonly userService: UserService) {}
 
   @Post('stripe/checkout-sessions')
   async createCheckoutSession(@Body() body: IBody) {
@@ -81,21 +93,70 @@ export class CreateStripeCheckoutSessionController {
 
   @Post('stripe/payment-intents')
   async createPaymentIntent(@Body() body: ICreatePaymentIntentBody) {
+    const stripeCustomerId = body.customerId
+      ? (await this.userService.findOne(body.customerId)).stripeCustomerId
+      : null;
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: await calculateTotalAmount(body.line_items),
       currency: 'usd',
       automatic_payment_methods: { enabled: true },
-      receipt_email: body.userData.email,
-      shipping: {
-        name: body.userData.name,
-        address: {
-          country: body.userData.country,
-          postal_code: body.userData.postalCode,
+      ...(body.customerId && {
+        customer: stripeCustomerId,
+      }),
+      ...(body.userData && {
+        receipt_email: body.userData.email,
+        shipping: {
+          name: body.userData.name,
+          address: {
+            country: body.userData.country,
+            postal_code: body.userData.postalCode,
+          },
         },
-      },
+      }),
     });
 
     await delay(5000);
+
+    return {
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
+    };
+  }
+
+  @Post('stripe/setup-intents')
+  async createSetupIntent(@Body() body) {
+    const user = await this.userService.findOne(body.userId);
+
+    const setupIntent = await stripe.setupIntents.create({
+      customer: user.stripeCustomerId,
+      payment_method_types: ['card'],
+    });
+
+    return setupIntent.client_secret;
+  }
+
+  @Get('stripe/:customerId/payment-methods')
+  async getPaymentMethods(@Param('customerId') customerId: string) {
+    const user = await this.userService.findOne(customerId);
+
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: user.stripeCustomerId,
+      type: 'card',
+    });
+
+    return paymentMethods.data;
+  }
+
+  @Patch('stripe/payment-intents/:paymentIntentId')
+  async updatePaymentIntent(
+    @Param('paymentIntentId') paymentIntentId: string,
+    @Body() body,
+  ) {
+    const paymentIntent = await stripe.paymentIntents.update(
+      paymentIntentId,
+      body,
+    );
 
     return paymentIntent.client_secret;
   }

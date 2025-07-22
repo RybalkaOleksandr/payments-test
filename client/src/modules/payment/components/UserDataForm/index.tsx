@@ -4,6 +4,7 @@ import { observer } from "mobx-react";
 import { Controller, useForm } from "react-hook-form";
 
 import styles from "./styles.module.scss";
+import { currentUserStore } from "@modules/user/stores";
 
 interface IProps {
   onSubmit: (userData: IUserData) => void;
@@ -21,10 +22,13 @@ const UserDataForm = ({ onSubmit }: IProps) => {
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: {
-      name: "",
-      email: "",
-      country: "",
-      postalCode: "",
+      name:
+        currentUserStore.currentUser?.firstName +
+          " " +
+          currentUserStore.currentUser?.lastName || "",
+      email: currentUserStore.currentUser?.email || "",
+      country: "Ukraine",
+      postalCode: "61000",
     },
   });
 

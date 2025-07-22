@@ -7,11 +7,13 @@ import { IUserData } from "../types";
 
 export type CreatePaymentIntentStoreData = {
   line_items: { quantity: number; price: string }[];
-  userData: IUserData;
+  userData?: IUserData;
+  customerId?: string;
 };
 
 class CreatePaymentIntentStore extends BaseStore<CreatePaymentIntentStoreData> {
   public clientSecret: string | null = null;
+  public paymentIntentId: string | null = null;
 
   public onExecute = async ({
     data,
@@ -19,7 +21,8 @@ class CreatePaymentIntentStore extends BaseStore<CreatePaymentIntentStoreData> {
     const response = await stripeService.createPaymentIntent(data);
 
     runInAction(() => {
-      this.clientSecret = response;
+      this.clientSecret = response.clientSecret;
+      this.paymentIntentId = response.paymentIntentId;
     });
 
     return response;
