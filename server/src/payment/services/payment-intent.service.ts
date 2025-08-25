@@ -3,6 +3,7 @@ import { delay } from 'src/common/helpers';
 import { ICreatePaymentIntentBody } from '../types';
 import { stripe } from 'src/clients';
 import { UserService } from 'src/user/services/user.service';
+import config from 'src/config';
 
 @Injectable()
 export class PaymentIntentService {
@@ -26,6 +27,29 @@ export class PaymentIntentService {
     const paymentIntent = await stripe.paymentIntents.create({
       ...params,
       capture_method: 'manual', // the same as createPaymentIntent, but with this param
+    });
+
+    await delay(5000);
+
+    return {
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
+    };
+  }
+
+  async createPaymentIntentWithMarketplaceFee(body: ICreatePaymentIntentBody) {
+    const params = await this.generateCommonPaymentIntentParams(body);
+
+    const stripeFee =
+      params.amount * config.STRIPE_DEFAULT_FEE_PERCENT +
+      config.STRIPE_DEFAULT_FEE_FIXED;
+
+    const marketplaceFee = 200; // 2$
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      ...params,
+      transfer_data: { destination: 'acct_1Rzx6nKgsY8kawnN' }, // account of the shop in marketplace
+      application_fee_amount: stripeFee + marketplaceFee, // fee of the marketplace
     });
 
     await delay(5000);
