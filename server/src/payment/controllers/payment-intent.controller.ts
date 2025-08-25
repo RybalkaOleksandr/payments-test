@@ -66,6 +66,42 @@ export class PaymentIntentController {
     };
   }
 
+  @Post('stripe/payment-intents/money-freezing')
+  async createPaymentIntentWithMoneyFreezing(
+    @Body() body: ICreatePaymentIntentBody,
+  ) {
+    const stripeCustomerId = body.customerId
+      ? (await this.userService.findOne(body.customerId)).stripeCustomerId
+      : null;
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: await calculateTotalAmount(body.line_items),
+      currency: 'usd',
+      automatic_payment_methods: { enabled: true },
+      capture_method: 'manual', // the same as createPaymentIntent, but with this param
+      ...(body.customerId && {
+        customer: stripeCustomerId,
+      }),
+      ...(body.userData && {
+        receipt_email: body.userData.email,
+        shipping: {
+          name: body.userData.name,
+          address: {
+            country: body.userData.country,
+            postal_code: body.userData.postalCode,
+          },
+        },
+      }),
+    });
+
+    await delay(5000);
+
+    return {
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
+    };
+  }
+
   @Patch('stripe/payment-intents/:paymentIntentId')
   async updatePaymentIntent(
     @Param('paymentIntentId') paymentIntentId: string,
