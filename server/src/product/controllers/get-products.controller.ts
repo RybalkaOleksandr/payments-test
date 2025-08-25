@@ -3,16 +3,20 @@ import { stripe } from 'src/clients';
 
 const mapProducts = (rawStripeProducts: any[], rawStripePrices: any[]) => {
   return rawStripeProducts.map((stripeProduct) => {
-    const price = rawStripePrices.find(
-      (price) => price.id === stripeProduct.default_price,
+    const prices = rawStripePrices.filter(
+      (price) => price.product === stripeProduct.id,
     );
 
     return {
       id: stripeProduct.id,
       name: stripeProduct.name,
       description: stripeProduct.description,
-      priceId: stripeProduct.default_price,
-      price: (price.unit_amount / 100).toFixed(2),
+      prices: prices.map((price) => ({
+        id: price.id,
+        total: (price.unit_amount / 100).toFixed(2),
+        type: price.type,
+        intervalUnit: price.recurring?.interval,
+      })),
     };
   });
 };

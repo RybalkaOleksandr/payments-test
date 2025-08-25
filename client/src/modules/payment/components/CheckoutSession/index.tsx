@@ -16,7 +16,7 @@ const CheckoutSession = () => {
           line_items: newOrderStore.order?.products.map((el) => {
             return {
               quantity: el.quantity,
-              price: el.priceId,
+              price: el.selectedPriceId,
             };
           }),
           userId: currentUserStore.currentUser?.id,

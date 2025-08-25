@@ -1,6 +1,7 @@
-import { newOrderStore } from "@modules/product/stores";
+import { newOrderStore, selectedPricesStore } from "@modules/product/stores";
 import { IProduct } from "@modules/product/types";
-import { InputNumber } from "antd";
+import { InputNumber, Select } from "antd";
+import styles from "./style.module.scss";
 
 export const getNameColumn = () => ({
   title: "Product Name",
@@ -20,7 +21,30 @@ export const getPriceColumn = () => ({
   title: "Price (USD)",
   key: "name",
   ellipsis: true,
-  render: ({ price }: IProduct) => <span>${price}</span>,
+  render: ({ prices, id }: IProduct) => {
+    return prices.length === 1 ? (
+      <span>${prices[0].total}</span>
+    ) : (
+      <Select
+        className={styles.priceSelect}
+        options={prices.map((price) => ({
+          label: ` ${price.intervalUnit} - $${price.total}`,
+          value: price.id,
+        }))}
+        onChange={(value) => {
+          const selectedPrice = prices.find((price) => price.id === value);
+
+          if (selectedPrice) {
+            selectedPricesStore.setSelectedPrice({
+              productId: id,
+              priceId: selectedPrice?.id,
+              price: Number(selectedPrice?.total),
+            });
+          }
+        }}
+      />
+    );
+  },
 });
 
 export const getQuantityColumn = () => ({
@@ -44,10 +68,22 @@ export const getQuantityColumn = () => ({
             p.id === product.id ? { ...p, quantity: value } : p
           );
 
+          const selectedPrice = selectedPricesStore.selectedPrices.find(
+            (price) => price.productId === product.id
+          );
+
           newOrderStore.setOrder({
             products: isProductAlreadyAdded
               ? updatedProducts
-              : [...existingProducts, { ...product, quantity: value }],
+              : [
+                  ...existingProducts,
+                  {
+                    ...product,
+                    selectedPriceId:
+                      selectedPrice?.priceId ?? product.prices[0].id,
+                    quantity: value,
+                  },
+                ],
           });
         }
       }}
