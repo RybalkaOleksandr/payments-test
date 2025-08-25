@@ -1,5 +1,5 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { IPaymentBaseBody } from '../types';
+import { ICreateCheckoutSessionBody } from '../types';
 import { CheckoutSessionService } from '../services/checkout-session.service';
 
 @Controller()
@@ -9,7 +9,7 @@ export class CheckoutSessionController {
   ) {}
 
   @Post('stripe/checkout-sessions')
-  async createCheckoutSession(@Body() body: IPaymentBaseBody) {
+  async createCheckoutSession(@Body() body: ICreateCheckoutSessionBody) {
     return this.checkoutSessionService.createCheckoutSession(body);
   }
 }

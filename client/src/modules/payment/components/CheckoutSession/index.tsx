@@ -4,6 +4,7 @@ import styles from "./styles.module.scss";
 import { Button } from "antd";
 import { createCheckoutSessionStore } from "@modules/payment/stores";
 import { useRouter } from "next/navigation";
+import { currentUserStore } from "@modules/user/stores";
 
 const CheckoutSession = () => {
   const router = useRouter();
@@ -18,6 +19,7 @@ const CheckoutSession = () => {
               price: el.priceId,
             };
           }),
+          userId: currentUserStore.currentUser?.id,
         },
         onSuccess: () => {
           router.push(createCheckoutSessionStore.checkoutUrl!);
