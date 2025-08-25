@@ -114,4 +114,16 @@ export class PaymentIntentController {
 
     return paymentIntent.client_secret;
   }
+
+  @Post('stripe/payment-intents/:paymentIntentId/capture')
+  async capturePaymentIntent(
+    @Param('paymentIntentId') paymentIntentId: string,
+  ) {
+    return stripe.paymentIntents.capture(paymentIntentId);
+  }
+
+  @Post('stripe/payment-intents/:paymentIntentId/cancel')
+  async cancelPaymentIntent(@Param('paymentIntentId') paymentIntentId: string) {
+    return stripe.paymentIntents.cancel(paymentIntentId);
+  }
 }
