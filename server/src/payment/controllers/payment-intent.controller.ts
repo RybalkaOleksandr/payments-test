@@ -1,92 +1,22 @@
 import { Controller, Post, Body, Param, Patch } from '@nestjs/common';
 import { stripe } from 'src/clients';
-import { delay } from 'src/common/helpers';
-import { UserService } from 'src/user/services/user.service';
 import { ICreatePaymentIntentBody } from '../types';
-
-async function calculateTotalAmount(line_items) {
-  let total = 0;
-
-  for (const item of line_items) {
-    const price = await stripe.prices.retrieve(item.price);
-    const unitAmount = price.unit_amount; // cents/pennies
-    total += unitAmount * item.quantity;
-  }
-
-  return total;
-}
+import { PaymentIntentService } from '../services/payment-intent.service';
 
 @Controller()
 export class PaymentIntentController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly paymentIntentService: PaymentIntentService) {}
 
   @Post('stripe/payment-intents')
   async createPaymentIntent(@Body() body: ICreatePaymentIntentBody) {
-    const stripeCustomerId = body.customerId
-      ? (await this.userService.findOne(body.customerId)).stripeCustomerId
-      : null;
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: await calculateTotalAmount(body.line_items),
-      currency: 'usd',
-      automatic_payment_methods: { enabled: true },
-      ...(body.customerId && {
-        customer: stripeCustomerId,
-      }),
-      ...(body.userData && {
-        receipt_email: body.userData.email,
-        shipping: {
-          name: body.userData.name,
-          address: {
-            country: body.userData.country,
-            postal_code: body.userData.postalCode,
-          },
-        },
-      }),
-    });
-
-    await delay(5000);
-
-    return {
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
-    };
+    return this.paymentIntentService.createPaymentIntent(body);
   }
 
   @Post('stripe/payment-intents/money-freezing')
   async createPaymentIntentWithMoneyFreezing(
     @Body() body: ICreatePaymentIntentBody,
   ) {
-    const stripeCustomerId = body.customerId
-      ? (await this.userService.findOne(body.customerId)).stripeCustomerId
-      : null;
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: await calculateTotalAmount(body.line_items),
-      currency: 'usd',
-      automatic_payment_methods: { enabled: true },
-      capture_method: 'manual', // the same as createPaymentIntent, but with this param
-      ...(body.customerId && {
-        customer: stripeCustomerId,
-      }),
-      ...(body.userData && {
-        receipt_email: body.userData.email,
-        shipping: {
-          name: body.userData.name,
-          address: {
-            country: body.userData.country,
-            postal_code: body.userData.postalCode,
-          },
-        },
-      }),
-    });
-
-    await delay(5000);
-
-    return {
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
-    };
+    return this.paymentIntentService.createPaymentIntentWithMoneyFreezing(body);
   }
 
   @Patch('stripe/payment-intents/:paymentIntentId')
