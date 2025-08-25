@@ -2,20 +2,7 @@ import { Controller, Post, Body, Param, Patch } from '@nestjs/common';
 import { stripe } from 'src/clients';
 import { delay } from 'src/common/helpers';
 import { UserService } from 'src/user/services/user.service';
-
-interface IBody {
-  line_items: [{ quantity: number; price: string }];
-}
-
-interface ICreatePaymentIntentBody extends IBody {
-  customerId?: string;
-  userData?: {
-    name: string;
-    email: string;
-    country: string;
-    postalCode: string;
-  };
-}
+import { ICreatePaymentIntentBody } from '../types';
 
 async function calculateTotalAmount(line_items) {
   let total = 0;
