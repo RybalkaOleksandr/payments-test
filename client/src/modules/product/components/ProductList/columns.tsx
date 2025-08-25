@@ -61,7 +61,7 @@ export const getQuantityColumn = () => ({
           (existedProduct) => existedProduct.id === product.id
         );
 
-        if (value || value === 0) {
+        if (value) {
           const existingProducts = newOrderStore?.order?.products || [];
 
           const updatedProducts = existingProducts.map((p) =>
@@ -84,6 +84,15 @@ export const getQuantityColumn = () => ({
                     quantity: value,
                   },
                 ],
+          });
+        }
+
+        if (value === 0) {
+          newOrderStore.setOrder({
+            products:
+              newOrderStore.order?.products?.filter(
+                (p) => p.id !== product.id
+              ) || [],
           });
         }
       }}
