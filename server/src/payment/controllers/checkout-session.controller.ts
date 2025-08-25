@@ -14,6 +14,9 @@ export class CheckoutSessionController {
       success_url: `${process.env.SITE_URL}/payment-success`,
       cancel_url: `${process.env.SITE_URL}/cancel`,
       line_items: body.line_items,
+      // payment_intent_data: {
+      //   capture_method: 'manual', // if you want to freeze the money
+      // },
     });
 
     return { url: session.url };
