@@ -9,7 +9,9 @@ export class PaymentIntentController {
 
   @Post('stripe/payment-intents')
   async createPaymentIntent(@Body() body: ICreatePaymentIntentBody) {
-    return this.paymentIntentService.createPaymentIntent(body);
+    return this.paymentIntentService.createPaymentIntentWithMarketplaceFee(
+      body,
+    );
   }
 
   @Post('stripe/payment-intents/money-freezing')
