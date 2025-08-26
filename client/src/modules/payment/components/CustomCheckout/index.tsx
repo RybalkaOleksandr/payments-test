@@ -51,7 +51,7 @@ const CustomCheckout = ({ userData }: IProps) => {
         line_items: newOrderStore.order.products.map((el) => {
           return {
             quantity: el.quantity,
-            price: el.priceId,
+            price: el.selectedPriceId,
           };
         }),
         userData,
@@ -115,7 +115,7 @@ const CustomCheckout = ({ userData }: IProps) => {
         line_items: newOrderStore.order.products.map((el) => {
           return {
             quantity: el.quantity,
-            price: el.priceId,
+            price: el.selectedPriceId,
           };
         }),
         customerId: currentUserStore.currentUser?.id,

@@ -6,6 +6,7 @@ import { ProductList } from "@modules/product/components";
 import TotalAmount from "@modules/product/components/TotalAmount";
 import CustomCheckoutBtn from "@modules/payment/components/CustomCheckoutBtn";
 import SelectUser from "@modules/user/components/SelectUser";
+import PurchaseSubscriptionBtn from "@modules/payment/components/PurchaseSubscriptionBtn";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
       <TotalAmount />
       <CheckoutSession />
       <CustomCheckoutBtn />
+      <PurchaseSubscriptionBtn />
     </div>
   );
 }

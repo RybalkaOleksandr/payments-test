@@ -1,5 +1,6 @@
 import { ownApi } from "@utils/axios";
 import { CreateCheckoutSessionStoreData } from "../stores/CreateCheckoutSessionStore";
+import { IUser } from "@modules/user/types";
 
 class StripeService {
   public createCheckoutSession = async (
@@ -49,6 +50,19 @@ class StripeService {
   }): Promise<any> => {
     try {
       const { data } = await ownApi.post("stripe/setup-intents", { userId });
+
+      return data;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  };
+
+  public createSubscription = async (params: {
+    line_items: { priceId: string }[];
+    currentUser: IUser;
+  }): Promise<any> => {
+    try {
+      const { data } = await ownApi.post("stripe/subscriptions", params);
 
       return data;
     } catch (error: any) {
