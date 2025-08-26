@@ -39,17 +39,11 @@ export class StripeSubscriptionService {
         price: item.priceId,
         quantity: 1,
       })),
-      payment_behavior: 'default_incomplete',
-      expand: ['latest_invoice.payment_intent'],
     });
-
-    // TODO: there is no payment intent in response
 
     return {
       subscriptionId: subscription.id,
       status: subscription.status,
-      clientSecret: (subscription.latest_invoice as any)?.payment_intent
-        ?.client_secret,
     };
   }
 }
