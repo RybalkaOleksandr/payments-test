@@ -8,6 +8,7 @@ import { IUser } from "@modules/user/types";
 export type CreateSubscriptionStoreData = {
   line_items: { priceId: string }[];
   currentUser: IUser;
+  paymentMethodId?: string;
 };
 
 class CreateSubscriptionStore extends BaseStore<CreateSubscriptionStoreData> {

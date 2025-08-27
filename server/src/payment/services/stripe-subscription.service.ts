@@ -9,6 +9,7 @@ export interface ICreateSubscriptionBody {
     name: string;
     stripeCustomerId?: string;
   };
+  paymentMethodId?: string;
 }
 
 @Injectable()
@@ -16,22 +17,8 @@ export class StripeSubscriptionService {
   constructor() {}
 
   async createSubscription(body: ICreateSubscriptionBody) {
-    const { line_items, currentUser } = body;
+    const { line_items, currentUser, paymentMethodId } = body;
     const stripeCustomerId = currentUser.stripeCustomerId;
-
-    console.log(stripeCustomerId);
-
-    const { data: paymentMethods } = await stripe.paymentMethods.list({
-      customer: stripeCustomerId,
-      type: 'card',
-    });
-
-    console.log(
-      line_items.map((item) => ({
-        price: item.priceId,
-        quantity: 1,
-      })),
-    );
 
     const subscription = await stripe.subscriptions.create({
       customer: stripeCustomerId,
@@ -39,6 +26,9 @@ export class StripeSubscriptionService {
         price: item.priceId,
         quantity: 1,
       })),
+      ...(paymentMethodId && {
+        default_payment_method: paymentMethodId,
+      }),
     });
 
     return {
