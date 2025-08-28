@@ -68,6 +68,25 @@ class StripeService {
       throw new Error(error.message);
     }
   };
+
+  public setDefaultPaymentMethod = async ({
+    customerId,
+    paymentMethodId,
+  }: {
+    customerId: string;
+    paymentMethodId: string;
+  }): Promise<any> => {
+    try {
+      const { data } = await ownApi.post(
+        `stripe/${customerId}/default-payment-method`,
+        { paymentMethodId }
+      );
+
+      return data;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  };
 }
 
 export default new StripeService();
