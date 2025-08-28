@@ -5,24 +5,22 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { Button, message, Select, Switch } from "antd";
+import { Button, notification, Select, Switch } from "antd";
 import { useState } from "react";
 
 import styles from "./styles.module.scss";
 import {
-  createPaymentIntentStore,
   createSetupIntentStore,
   createSubscriptionStore,
   currentPaymentMethodStore,
   paymentMethodsStore,
+  setDefaultPaymentMethodStore,
 } from "@modules/payment/stores";
 import { newOrderStore } from "@modules/product/stores";
 import { observer } from "mobx-react";
-import { useRouter } from "next/navigation";
 import { currentUserStore } from "@modules/user/stores";
 
 const PurchaseSubscriptionCardForm = () => {
-  const router = useRouter();
   const [error, setError] = useState("");
   const [processing, setProcessing] = useState(false);
   const [saveCard, setSaveCard] = useState(false);
@@ -56,115 +54,66 @@ const PurchaseSubscriptionCardForm = () => {
       },
 
       onSuccess: (response) => {
-        message.success("Subscription created");
+        notification.success({ message: "Subscription created" });
         console.log("Subscription created:", response);
       },
       onError: (error) => {
-        message.error("Subscription creation error: " + error.message);
+        notification.error({
+          message: "Subscription creation error: " + error.message,
+        });
       },
     });
   };
 
-  // const checkoutWithNewCard = async () => {
-  //   if (!stripe || !elements || !newOrderStore.order?.products) {
-  //     return;
-  //   }
+  const createSubscriptionWithNewCard = async () => {
+    if (!stripe || !elements || !newOrderStore.order?.products) {
+      return;
+    }
 
-  //   setProcessing(true);
+    setProcessing(true);
 
-  //   createPaymentIntentStore.execute({
-  //     data: {
-  //       line_items: newOrderStore.order.products.map((el) => {
-  //         return {
-  //           quantity: el.quantity,
-  //           price: el.selectedPriceId,
-  //         };
-  //       }),
-  //       userData,
-  //     },
-  //     onSuccess: async ({ clientSecret }) => {
-  //       if (saveCard && currentUserStore.currentUser) {
-  //         await createSetupIntentStore.execute({
-  //           data: {
-  //             userId: currentUserStore.currentUser.id,
-  //           },
-  //         });
-  //       }
+    createSetupIntentStore.execute({
+      data: { userId: currentUserStore.currentUser!.id },
+      onSuccess: async (clientSecret: string) => {
+        const cardElement = elements.getElement(CardNumberElement);
 
-  //       const cardElement = elements.getElement(CardNumberElement);
+        const result = await stripe?.confirmCardSetup(clientSecret, {
+          payment_method: { card: cardElement! },
+        });
 
-  //       const payload = await stripe?.confirmCardPayment(clientSecret, {
-  //         payment_method: {
-  //           card: cardElement!,
-  //         },
-  //       });
+        await setDefaultPaymentMethodStore.execute({
+          data: {
+            customerId: currentUserStore.currentUser!.id,
+            paymentMethodId: result?.setupIntent?.payment_method as string,
+          },
+        });
 
-  //       setProcessing(false);
+        createSubscriptionStore.execute({
+          data: {
+            line_items: newOrderStore.order!.products.map((el) => ({
+              priceId: el.selectedPriceId,
+            })),
+            currentUser: currentUserStore.currentUser!,
+          },
 
-  //       if (payload?.error?.message) {
-  //         setError(payload.error.message);
-  //       } else {
-  //         if (saveCard && createSetupIntentStore.clientSecret) {
-  //           await stripe?.confirmCardSetup(
-  //             createSetupIntentStore.clientSecret,
-  //             {
-  //               payment_method: {
-  //                 card: cardElement!,
-  //               },
-  //             }
-  //           );
-  //         }
+          onSuccess: (response) => {
+            notification.success({ message: "Subscription created" });
+            console.log("Subscription created:", response);
+          },
+          onError: (error) => {
+            notification.error({
+              message: "Subscription creation error: " + error.message,
+            });
+          },
+        });
 
-  //         router.push("/payment-success");
-  //       }
-  //     },
-  //     onError: () => {
-  //       setProcessing(false);
-  //     },
-  //   });
-  // };
-
-  // const checkoutWithExistingCard = async () => {
-  //   if (
-  //     !stripe ||
-  //     !elements ||
-  //     !newOrderStore.order?.products ||
-  //     !currentPaymentMethodStore.currentPaymentMethod
-  //   ) {
-  //     return;
-  //   }
-
-  //   setProcessing(true);
-
-  //   createPaymentIntentStore.execute({
-  //     data: {
-  //       line_items: newOrderStore.order.products.map((el) => {
-  //         return {
-  //           quantity: el.quantity,
-  //           price: el.selectedPriceId,
-  //         };
-  //       }),
-  //       customerId: currentUserStore.currentUser?.id,
-  //     },
-  //     onSuccess: async ({ clientSecret }) => {
-  //       console.log(currentPaymentMethodStore.currentPaymentMethod);
-  //       const payload = await stripe?.confirmCardPayment(clientSecret, {
-  //         payment_method: currentPaymentMethodStore.currentPaymentMethod.id,
-  //       });
-
-  //       setProcessing(false);
-
-  //       if (payload?.error?.message) {
-  //         setError(payload.error.message);
-  //       } else {
-  //         router.push("/payment-success");
-  //       }
-  //     },
-  //     onError: () => {
-  //       setProcessing(false);
-  //     },
-  //   });
-  // };
+        setProcessing(false);
+      },
+      onError: () => {
+        setProcessing(false);
+      },
+    });
+  };
 
   const cardStyle = {
     style: {
@@ -257,7 +206,7 @@ const PurchaseSubscriptionCardForm = () => {
               !!error || !stripe || !elements || !newOrderStore.order?.products
             }
             loading={processing}
-            // onClick={checkoutWithNewCard}
+            onClick={createSubscriptionWithNewCard}
           >
             {processing ? "PROCESSING" : "PAY"}
           </Button>
