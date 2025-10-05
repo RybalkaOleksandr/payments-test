@@ -5,3 +5,4 @@ export { default as currentPaymentMethodStore } from "./CurrentPaymentMethodStor
 export { default as createSetupIntentStore } from "./CreateSetupIntentStore";
 export { default as createSubscriptionStore } from "./CreateSubscriptionStore";
 export { default as setDefaultPaymentMethodStore } from "./SetDefaultPaymentMethodStore";
+export { default as createCustomPaymentIntentStore } from "./CreateCustomPaymentIntentStore";
