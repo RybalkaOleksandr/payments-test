@@ -5,6 +5,7 @@ import { observer } from "mobx-react";
 import { createSubscriptionStore } from "../../stores";
 import useModal from "@modules/common/hooks/useModal";
 import PurchaseSubscriptionCardForm from "../PurchaseSubscriptionCardForm";
+import { currentUserStore } from "@modules/user/stores";
 
 const PurchaseSubscriptionBtn = () => {
   const purchaseSubscriptionModal = useModal();
@@ -19,6 +20,7 @@ const PurchaseSubscriptionBtn = () => {
               onClick={() => purchaseSubscriptionModal.setIsVisible(true)}
               loading={createSubscriptionStore.isLoading}
               style={{ marginLeft: "10px" }}
+              disabled={!currentUserStore.currentUser}
             >
               Create subscription
             </Button>

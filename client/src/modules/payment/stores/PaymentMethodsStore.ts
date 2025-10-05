@@ -24,12 +24,17 @@ class PaymentMethodsStore extends BaseStore<PaymentMethodsStoreData> {
     return response;
   };
 
+  clear = () => {
+    this.paymentMethods = [];
+  };
+
   constructor() {
     super();
 
     makeObservable(this, {
       paymentMethods: observable,
       onExecute: action,
+      clear: action,
     });
   }
 }

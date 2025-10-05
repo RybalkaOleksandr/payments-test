@@ -77,6 +77,7 @@ const AddPaymentDetailsBtn = () => {
             <Button
               className={styles.checkoutBtn}
               onClick={() => addPaymentDetailsModal.setIsVisible(true)}
+              disabled={!currentUserStore.currentUser}
             >
               Add Payment Details
             </Button>
