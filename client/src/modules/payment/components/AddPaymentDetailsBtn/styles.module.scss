@@ -1,0 +1,54 @@
+.cardFormWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.cardForm {
+  padding: 10px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border: 2px solid black;
+}
+
+.cardFormTitle {
+  text-align: center;
+}
+
+.cardElement {
+  border: 1px dashed black;
+  height: 40px;
+  margin-bottom: 5px;
+}
+
+.errorMessage {
+  color: red;
+  text-align: center;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+
+.existingCardWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.existingCardSelect {
+  width: 400px;
+}
+
+.checkoutBtn {
+  width: 300px;
+  height: 50px;
+  background: lightblue;
+}

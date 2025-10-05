@@ -5,12 +5,20 @@ import { User, UserSchema } from 'src/user/schemas/user.schema';
 import { paymentModuleControllers } from './controllers';
 import { PaymentIntentService } from './services/payment-intent.service';
 import { CheckoutSessionService } from './services/checkout-session.service';
+import { StripeSubscriptionService } from './services/stripe-subscription.service';
+import { DefaultPaymentMethodService } from './services/default-payment-method.service';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: paymentModuleControllers,
-  providers: [UserService, PaymentIntentService, CheckoutSessionService],
+  providers: [
+    UserService,
+    PaymentIntentService,
+    CheckoutSessionService,
+    StripeSubscriptionService,
+    DefaultPaymentMethodService,
+  ],
 })
 export class PaymentModule {}

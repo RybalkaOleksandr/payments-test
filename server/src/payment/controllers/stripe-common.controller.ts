@@ -5,14 +5,20 @@ import {
   RawBodyRequest,
   Get,
   Param,
+  Body,
 } from '@nestjs/common';
 import { stripe } from 'src/clients';
 import { Request } from 'express';
 import { UserService } from 'src/user/services/user.service';
+import { SetDefaultPaymentMethodDto } from '../dto/set-default-payment-method.dto';
+import { DefaultPaymentMethodService } from '../services/default-payment-method.service';
 
 @Controller()
 export class StripeCommonController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly defaultPaymentMethodService: DefaultPaymentMethodService,
+  ) {}
 
   @Post('stripe/webhook')
   async handleStripeWebhook(@Req() req: RawBodyRequest<Request>) {
@@ -59,5 +65,23 @@ export class StripeCommonController {
     });
 
     return paymentMethods.data;
+  }
+
+  // @Get('stripe/:customerId/default-payment-method')
+  // async getDefaultPaymentMethod(@Param('customerId') customerId: string) {
+  //   return await this.defaultPaymentMethodService.getDefaultPaymentMethod(
+  //     customerId,
+  //   );
+  // }
+
+  @Post('stripe/:customerId/default-payment-method')
+  async setDefaultPaymentMethod(
+    @Param('customerId') customerId: string,
+    @Body() setDefaultPaymentMethodDto: SetDefaultPaymentMethodDto,
+  ) {
+    return await this.defaultPaymentMethodService.setDefaultPaymentMethod(
+      customerId,
+      setDefaultPaymentMethodDto,
+    );
   }
 }
