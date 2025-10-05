@@ -27,42 +27,37 @@ const GooglePayBtn = () => {
         return;
       }
 
-      createCustomPaymentIntentStore.execute({
-        data: {
+      const paymentRequest = stripe.paymentRequest({
+        country: "US",
+        currency: "usd",
+        total: {
+          label: "Your Order",
           amount: totalAmount * 100,
-          currency: "usd",
         },
-        onSuccess: async ({ clientSecret }) => {
-          const paymentRequest = stripe.paymentRequest({
-            country: "US",
-            currency: "usd",
-            total: {
-              label: "Your Order",
-              amount: totalAmount * 100,
-            },
-            requestPayerName: true,
-            requestPayerEmail: true,
-          });
+        requestPayerName: true,
+        requestPayerEmail: true,
+      });
 
-          paymentRequest.canMakePayment().then((result) => {
-            console.log("result", result);
-            if (result && result.googlePay) {
-              setPaymentRequest(paymentRequest);
-            }
-          });
+      paymentRequest.canMakePayment().then((result) => {
+        if (result && result.googlePay) {
+          setPaymentRequest(paymentRequest);
+        }
+      });
 
-          paymentRequest.on("paymentmethod", async (ev) => {
+      paymentRequest.on("paymentmethod", async (ev) => {
+        createCustomPaymentIntentStore.execute({
+          data: { amount: totalAmount * 100, currency: "usd" },
+          onSuccess: async ({ clientSecret }) => {
             const { error } = await stripe.confirmCardPayment(clientSecret, {
               payment_method: ev.paymentMethod.id,
             });
 
-            if (error) {
-              ev.complete("fail");
-            } else {
-              ev.complete("success");
-            }
-          });
-        },
+            ev.complete(error ? "fail" : "success");
+          },
+          onError: () => {
+            ev.complete("fail");
+          },
+        });
       });
     }
 
