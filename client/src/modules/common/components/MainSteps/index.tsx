@@ -27,7 +27,7 @@ const MainSteps = () => {
 
   return (
     <div className={styles.wrapper}>
-      <Card title={stepsNode} headStyle={{ background: "#fafafa" }}>
+      <Card title={stepsNode}>
         <Col>
           <div>
             {currentStep === 0 && (
