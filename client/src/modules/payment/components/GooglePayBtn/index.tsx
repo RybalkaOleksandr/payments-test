@@ -7,6 +7,7 @@ import { newOrderStore } from "@modules/product/stores";
 import { observer } from "mobx-react";
 import { createCustomPaymentIntentStore } from "@modules/payment/stores";
 import { OrderProductType } from "@modules/product/enums";
+import styles from "./styles.module.scss";
 
 const GooglePayBtn = () => {
   const stripe = useStripe();
@@ -70,19 +71,24 @@ const GooglePayBtn = () => {
 
   if (!paymentRequest) {
     return (
-      <div style={{ color: "red", textAlign: "center" }}>
-        Google Pay unavailable
+      <div className={styles.wrapper}>
+        <div className={styles.googlePayUnavailable}>
+          Google Pay unavailable
+        </div>
       </div>
     );
   }
 
   return (
-    <PaymentRequestButtonElement
-      options={{
-        paymentRequest,
-        style: { paymentRequestButton: { type: "buy", theme: "light" } },
-      }}
-    />
+    <div className={styles.wrapper}>
+      <PaymentRequestButtonElement
+        options={{
+          paymentRequest,
+          style: { paymentRequestButton: { type: "buy", theme: "light" } },
+        }}
+        className={styles.googlePayBtn}
+      />
+    </div>
   );
 };
 
