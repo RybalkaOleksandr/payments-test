@@ -8,6 +8,7 @@ import CustomCheckoutBtn from "@modules/payment/components/CustomCheckoutBtn";
 import SelectUser from "@modules/user/components/SelectUser";
 import PurchaseSubscriptionBtn from "@modules/payment/components/PurchaseSubscriptionBtn";
 import AddPaymentDetailsBtn from "@modules/payment/components/AddPaymentDetailsBtn";
+import GooglePayBtn from "@modules/payment/components/GooglePayBtn";
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
       <CustomCheckoutBtn />
       <AddPaymentDetailsBtn />
       <PurchaseSubscriptionBtn />
+      <GooglePayBtn />
     </div>
   );
 }
