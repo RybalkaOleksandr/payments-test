@@ -6,6 +6,7 @@ import {
 import { newOrderStore } from "@modules/product/stores";
 import { observer } from "mobx-react";
 import { createCustomPaymentIntentStore } from "@modules/payment/stores";
+import { OrderProductType } from "@modules/product/enums";
 
 const GooglePayBtn = () => {
   const stripe = useStripe();
@@ -17,7 +18,13 @@ const GooglePayBtn = () => {
 
   useEffect(() => {
     async function init() {
-      if (!stripe || !totalAmount) return;
+      if (
+        !stripe ||
+        !totalAmount ||
+        newOrderStore.productType === OrderProductType.RECURRING
+      ) {
+        return;
+      }
 
       createCustomPaymentIntentStore.execute({
         data: {

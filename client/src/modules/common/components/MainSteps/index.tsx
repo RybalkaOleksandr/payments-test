@@ -115,7 +115,7 @@ const MainSteps = () => {
                 <PurchaseSubscriptionBtn />
                 <GooglePayBtn />
 
-                <div style={{ display: "flex" }}>
+                <div style={{ display: "flex", marginTop: "20px" }}>
                   <Button
                     className={styles.backBtn}
                     onClick={() => setCurrentStep(2)}
