@@ -8,14 +8,14 @@ import { observer } from "mobx-react";
 import { createCustomPaymentIntentStore } from "@modules/payment/stores";
 import { OrderProductType } from "@modules/product/enums";
 import styles from "./styles.module.scss";
+import { useRouter } from "next/navigation";
 
 const GooglePayBtn = () => {
   const stripe = useStripe();
   const [paymentRequest, setPaymentRequest] = useState<any>(null);
+  const router = useRouter();
 
   const totalAmount = newOrderStore.total;
-
-  console.log("totalAmount", totalAmount);
 
   useEffect(() => {
     async function init() {
@@ -53,6 +53,7 @@ const GooglePayBtn = () => {
             });
 
             ev.complete(error ? "fail" : "success");
+            router.push("/payment-success");
           },
           onError: () => {
             ev.complete("fail");
@@ -62,7 +63,7 @@ const GooglePayBtn = () => {
     }
 
     init();
-  }, [stripe, totalAmount]);
+  }, [totalAmount]);
 
   if (!paymentRequest) {
     return (
