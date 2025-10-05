@@ -11,12 +11,14 @@ import { Button, Card, Col, Steps } from "antd";
 import { useState } from "react";
 import { newOrderStore } from "@modules/product/stores";
 import { observer } from "mobx-react";
+import SelectProductType from "@modules/product/components/SelectProductType";
 
 const MainSteps = () => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const stepsItems = [
     { title: "User Data (optional)" },
+    { title: "Product Type" },
     { title: "Products" },
     { title: "Payment" },
   ];
@@ -53,22 +55,24 @@ const MainSteps = () => {
 
             {currentStep === 1 && (
               <>
-                <ProductList />
-                <TotalAmount />
+                <SelectProductType />
 
                 <div
                   style={{ display: "flex", justifyContent: "space-between" }}
                 >
                   <Button
                     className={styles.backBtn}
-                    onClick={() => setCurrentStep(0)}
+                    onClick={() => {
+                      setCurrentStep(0);
+                      newOrderStore.setProductType(null);
+                    }}
                   >
                     Back
                   </Button>
                   <Button
                     className={styles.nextBtn}
                     onClick={() => setCurrentStep(2)}
-                    disabled={!newOrderStore.total}
+                    disabled={!newOrderStore.productType}
                   >
                     Next
                   </Button>
@@ -78,6 +82,34 @@ const MainSteps = () => {
 
             {currentStep === 2 && (
               <>
+                <ProductList />
+                <TotalAmount />
+
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <Button
+                    className={styles.backBtn}
+                    onClick={() => {
+                      setCurrentStep(1);
+                      newOrderStore.clearOrder();
+                    }}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    className={styles.nextBtn}
+                    onClick={() => setCurrentStep(3)}
+                    disabled={!newOrderStore.total}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </>
+            )}
+
+            {currentStep === 3 && (
+              <>
                 <CheckoutSession />
                 <CustomCheckoutBtn />
                 <PurchaseSubscriptionBtn />
@@ -86,7 +118,7 @@ const MainSteps = () => {
                 <div style={{ display: "flex" }}>
                   <Button
                     className={styles.backBtn}
-                    onClick={() => setCurrentStep(1)}
+                    onClick={() => setCurrentStep(2)}
                   >
                     Back
                   </Button>

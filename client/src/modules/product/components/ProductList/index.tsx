@@ -8,12 +8,16 @@ import {
   getQuantityColumn,
 } from "./columns";
 import { useEffect } from "react";
-import { productsStore } from "@modules/product/stores";
+import { newOrderStore, productsStore } from "@modules/product/stores";
 
 const ProductList = () => {
   useEffect(() => {
     productsStore.reload();
   }, []);
+
+  const relevantProducts = productsStore.products?.filter((product) =>
+    product.prices.every((price) => price.type === newOrderStore.productType)
+  );
 
   return (
     <Table
@@ -26,7 +30,7 @@ const ProductList = () => {
       ]}
       rowKey={({ id }: IProduct) => id}
       loading={false}
-      dataSource={productsStore.products || []}
+      dataSource={relevantProducts || []}
       pagination={false}
     />
   );
