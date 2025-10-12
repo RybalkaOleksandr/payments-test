@@ -12,6 +12,7 @@ import { useState } from "react";
 import { newOrderStore } from "@modules/product/stores";
 import { observer } from "mobx-react";
 import SelectProductType from "@modules/product/components/SelectProductType";
+import ApplePayBtn from "@modules/payment/components/ApplePayBtn";
 
 const MainSteps = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -114,6 +115,7 @@ const MainSteps = () => {
                 <CustomCheckoutBtn />
                 <PurchaseSubscriptionBtn />
                 <GooglePayBtn />
+                <ApplePayBtn />
 
                 <div style={{ display: "flex", marginTop: "20px" }}>
                   <Button
