@@ -6,7 +6,7 @@ import CustomCheckoutBtn from "@modules/payment/components/CustomCheckoutBtn";
 import SelectUser from "@modules/user/components/SelectUser";
 import PurchaseSubscriptionBtn from "@modules/payment/components/PurchaseSubscriptionBtn";
 import AddPaymentDetailsBtn from "@modules/payment/components/AddPaymentDetailsBtn";
-import GooglePayBtn from "@modules/payment/components/GooglePayBtn";
+import PaymentRequestButton from "@modules/payment/components/PaymentRequestButton";
 import { Button, Card, Col, Steps } from "antd";
 import { useState } from "react";
 import { newOrderStore } from "@modules/product/stores";
@@ -121,7 +121,7 @@ const MainSteps = () => {
                 <CheckoutSession />
                 <CustomCheckoutBtn />
                 <PurchaseSubscriptionBtn />
-                <GooglePayBtn />
+                <PaymentRequestButton />
                 <Elements
                   stripe={stripePromise}
                   options={{
