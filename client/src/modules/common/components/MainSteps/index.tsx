@@ -12,7 +12,6 @@ import { useState } from "react";
 import { newOrderStore } from "@modules/product/stores";
 import { observer } from "mobx-react";
 import SelectProductType from "@modules/product/components/SelectProductType";
-import ApplePayBtn from "@modules/payment/components/ApplePayBtn";
 import ExpressCheckout from "@modules/payment/components/ExpressCheckout";
 
 import { Elements } from "@stripe/react-stripe-js";
@@ -123,7 +122,6 @@ const MainSteps = () => {
                 <CustomCheckoutBtn />
                 <PurchaseSubscriptionBtn />
                 <GooglePayBtn />
-                <ApplePayBtn />
                 <Elements
                   stripe={stripePromise}
                   options={{

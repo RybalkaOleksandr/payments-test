@@ -3,41 +3,7 @@
   justify-content: center;
 }
 
-.googlePayUnavailable {
-  width: 100%;
-  max-width: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 20px;
-  margin-top: 20px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  color: #6c757d;
-  font-size: 14px;
-  font-weight: 500;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: "🚫";
-    font-size: 16px;
-    margin-right: 4px;
-  }
-
-  &:hover {
-    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-}
-
-.googlePayBtn {
+.paymentRequestBtn {
   width: 100%;
   max-width: 300px;
   height: 50px;
