@@ -39,7 +39,7 @@ const ApplePayBtn = () => {
       });
 
       paymentRequest.canMakePayment().then((result) => {
-        if (result && result.googlePay) {
+        if (result && result.applePay) {
           setPaymentRequest(paymentRequest);
         }
       });
