@@ -50,7 +50,6 @@ const storage = buildStorage({
 });
 
 export const removeRelatedCache = async (baseKey: string) => {
-  /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
   const keys = await forageStore.keys((err, keys) => keys);
 
   keys.map((key) => {
@@ -59,7 +58,8 @@ export const removeRelatedCache = async (baseKey: string) => {
 };
 
 const baseAxios = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_SERVER_API_URL,
+  baseURL: "/api",
+  // baseURL: process.env.NEXT_PUBLIC_SERVER_API_URL,
 });
 
 export const axiosInstance = setupCache(baseAxios, {
