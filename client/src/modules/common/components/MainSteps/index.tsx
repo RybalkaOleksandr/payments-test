@@ -13,6 +13,14 @@ import { newOrderStore } from "@modules/product/stores";
 import { observer } from "mobx-react";
 import SelectProductType from "@modules/product/components/SelectProductType";
 import ApplePayBtn from "@modules/payment/components/ApplePayBtn";
+import ExpressCheckout from "@modules/payment/components/ExpressCheckout";
+
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
 
 const MainSteps = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -116,7 +124,16 @@ const MainSteps = () => {
                 <PurchaseSubscriptionBtn />
                 <GooglePayBtn />
                 <ApplePayBtn />
-
+                <Elements
+                  stripe={stripePromise}
+                  options={{
+                    mode: "payment",
+                    amount: newOrderStore.total * 100,
+                    currency: "usd",
+                  }}
+                >
+                  <ExpressCheckout />
+                </Elements>
                 <div style={{ display: "flex", marginTop: "20px" }}>
                   <Button
                     className={styles.backBtn}
