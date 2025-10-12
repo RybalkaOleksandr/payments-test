@@ -94,7 +94,10 @@ const SelectUser: React.FC = () => {
             </div>
             <button
               className={styles.clearButton}
-              onClick={() => currentUserStore.clearCurrentUser()}
+              onClick={() => {
+                currentUserStore.clearCurrentUser();
+                paymentMethodsStore.clear();
+              }}
             >
               Clear
             </button>

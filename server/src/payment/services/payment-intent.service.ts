@@ -9,11 +9,25 @@ import config from 'src/config';
 export class PaymentIntentService {
   constructor(private readonly userService: UserService) {}
 
-  async createPaymentIntent(body: ICreatePaymentIntentBody) {
+  async createPaymentIntentWithStripePrice(body: ICreatePaymentIntentBody) {
     const params = await this.generateCommonPaymentIntentParams(body);
     const paymentIntent = await stripe.paymentIntents.create(params);
 
     await delay(5000);
+
+    return {
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
+    };
+  }
+
+  async createPaymentIntent(body: { amount: number; currency?: string }) {
+    const { amount, currency = 'usd' } = body;
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
+    });
 
     return {
       clientSecret: paymentIntent.client_secret,

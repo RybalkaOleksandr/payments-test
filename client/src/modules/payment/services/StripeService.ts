@@ -1,6 +1,7 @@
 import { ownApi } from "@utils/axios";
 import { CreateCheckoutSessionStoreData } from "../stores/CreateCheckoutSessionStore";
 import { CreateSubscriptionStoreData } from "../stores/CreateSubscriptionStore";
+import { CreateCustomPaymentIntentStoreData } from "../stores/CreateCustomPaymentIntentStore";
 
 class StripeService {
   public createCheckoutSession = async (
@@ -20,6 +21,21 @@ class StripeService {
   ): Promise<any> => {
     try {
       const { data } = await ownApi.post("stripe/payment-intents", params);
+
+      return data;
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  };
+
+  public createCustomPaymentIntent = async (
+    params: CreateCustomPaymentIntentStoreData
+  ): Promise<any> => {
+    try {
+      const { data } = await ownApi.post(
+        "stripe/custom-payment-intents",
+        params
+      );
 
       return data;
     } catch (error: any) {

@@ -42,6 +42,10 @@ export const getPriceColumn = () => ({
             });
           }
         }}
+        value={
+          newOrderStore.order?.products?.find((p) => p.id === id)
+            ?.selectedPriceId
+        }
       />
     );
   },
@@ -53,7 +57,10 @@ export const getQuantityColumn = () => ({
   ellipsis: true,
   render: (product: IProduct) => (
     <InputNumber
-      defaultValue={0}
+      defaultValue={
+        newOrderStore.order?.products?.find((p) => p.id === product.id)
+          ?.quantity || 0
+      }
       step={1}
       min={0}
       onChange={(value) => {

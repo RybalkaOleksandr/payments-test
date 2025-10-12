@@ -1,10 +1,12 @@
 import { action, observable, makeObservable } from "mobx";
 import { INewOrder } from "../types";
 import { selectedPricesStore } from ".";
+import { OrderProductType } from "../enums";
 
 class NewOrderStore {
   public order: INewOrder | null = null;
   public total: number = 0;
+  public productType: OrderProductType | null = null;
 
   public setOrder = (order: INewOrder | null) => {
     this.order = order ? { ...this.order, ...order } : order;
@@ -27,14 +29,21 @@ class NewOrderStore {
 
   public clearOrder = () => {
     this.order = null;
+    this.total = 0;
+  };
+
+  public setProductType = (productType: OrderProductType | null) => {
+    this.productType = productType;
   };
 
   constructor() {
     makeObservable(this, {
       order: observable,
       total: observable,
+      productType: observable,
       setOrder: action,
       clearOrder: action,
+      setProductType: action,
     });
   }
 }

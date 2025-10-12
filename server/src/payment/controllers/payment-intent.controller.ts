@@ -8,10 +8,17 @@ export class PaymentIntentController {
   constructor(private readonly paymentIntentService: PaymentIntentService) {}
 
   @Post('stripe/payment-intents')
-  async createPaymentIntent(@Body() body: ICreatePaymentIntentBody) {
-    return this.paymentIntentService.createPaymentIntentWithMarketplaceFee(
-      body,
-    );
+  async createPaymentIntentWithStripePrice(
+    @Body() body: ICreatePaymentIntentBody,
+  ) {
+    return this.paymentIntentService.createPaymentIntentWithStripePrice(body);
+  }
+
+  @Post('stripe/custom-payment-intents')
+  async createPaymentIntent(
+    @Body() body: { amount: number; currency?: string },
+  ) {
+    return this.paymentIntentService.createPaymentIntent(body);
   }
 
   @Post('stripe/payment-intents/money-freezing')

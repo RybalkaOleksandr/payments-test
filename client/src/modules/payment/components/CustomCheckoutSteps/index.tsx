@@ -14,7 +14,7 @@ const CustomCheckoutSteps = () => {
   const stepsNode = <Steps current={currentStep} items={stepsItems} />;
 
   return (
-    <Card title={stepsNode} headStyle={{ background: "#fafafa" }}>
+    <Card title={stepsNode}>
       <Col>
         <div>
           {currentStep === 0 && (
