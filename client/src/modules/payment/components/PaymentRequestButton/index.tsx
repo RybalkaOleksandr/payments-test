@@ -1,3 +1,4 @@
+// @cursor [prompt]
 import { useEffect, useState } from "react";
 import {
   useStripe,
