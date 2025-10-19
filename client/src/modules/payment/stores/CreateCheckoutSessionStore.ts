@@ -7,6 +7,7 @@ import { stripeService } from "../services";
 export type CreateCheckoutSessionStoreData = {
   line_items: { quantity: number; price: string }[];
   userId?: string;
+  customerId?: string;
 };
 
 class CreateCheckoutSessionStore extends BaseStore<CreateCheckoutSessionStoreData> {
