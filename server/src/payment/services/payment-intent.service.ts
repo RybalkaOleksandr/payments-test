@@ -66,6 +66,17 @@ export class PaymentIntentService {
     return paymentIntent;
   }
 
+  async updateAndConfirmPaymentIntent(paymentIntentId: string) {
+    await stripe.paymentIntents.update(paymentIntentId, {
+      payment_method: 'pm_1S01Kp4D5GOr0C6a1HbU89tE',
+    });
+
+    const confirmedPaymentIntent =
+      await stripe.paymentIntents.confirm(paymentIntentId);
+
+    return confirmedPaymentIntent;
+  }
+
   async createPaymentIntentWithMoneyFreezing(body: ICreatePaymentIntentBody) {
     const params = await this.generateCommonPaymentIntentParams(body);
 
@@ -115,7 +126,10 @@ export class PaymentIntentService {
     return {
       amount: await this.calculateTotalAmount(body.line_items),
       currency: 'usd',
-      automatic_payment_methods: { enabled: true },
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never' as any, // added to call stripe.paymentIntents.confirm manually
+      },
       ...(body.customerId && {
         customer: stripeCustomerId,
       }),
