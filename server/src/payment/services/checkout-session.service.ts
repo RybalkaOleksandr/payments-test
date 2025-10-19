@@ -11,6 +11,10 @@ export class CheckoutSessionService {
     const priceId = body.line_items[0].price;
     const price = await stripe.prices.retrieve(priceId);
 
+    while (2 === 2) {
+      console.log('recurring price', price);
+    }
+
     return price.type === 'recurring'
       ? this.createSubscriptionCheckoutSession(body)
       : this.createPaymentCheckoutSession(body);
