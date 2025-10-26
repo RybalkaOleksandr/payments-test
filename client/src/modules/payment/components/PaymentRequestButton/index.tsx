@@ -9,8 +9,9 @@ import { createCustomPaymentIntentStore } from "@modules/payment/stores";
 import { OrderProductType } from "@modules/product/enums";
 import styles from "./styles.module.scss";
 import { useRouter } from "next/navigation";
+import { Spin } from "antd";
 
-const GooglePayBtn = () => {
+const PaymentRequestButton = () => {
   const stripe = useStripe();
   const [paymentRequest, setPaymentRequest] = useState<any>(null);
   const router = useRouter();
@@ -39,7 +40,9 @@ const GooglePayBtn = () => {
       });
 
       paymentRequest.canMakePayment().then((result) => {
-        if (result && result.googlePay) {
+        // if (result && result.googlePay) {
+        // if (result && result.applePay) {
+        if (result) {
           setPaymentRequest(paymentRequest);
         }
       });
@@ -68,9 +71,7 @@ const GooglePayBtn = () => {
   if (!paymentRequest) {
     return (
       <div className={styles.wrapper}>
-        <div className={styles.googlePayUnavailable}>
-          Google Pay unavailable
-        </div>
+        <Spin />
       </div>
     );
   }
@@ -80,12 +81,12 @@ const GooglePayBtn = () => {
       <PaymentRequestButtonElement
         options={{
           paymentRequest,
-          style: { paymentRequestButton: { type: "buy", theme: "light" } },
+          style: { paymentRequestButton: { type: "buy", theme: "dark" } },
         }}
-        className={styles.googlePayBtn}
+        className={styles.paymentRequestBtn}
       />
     </div>
   );
 };
 
-export default observer(GooglePayBtn);
+export default observer(PaymentRequestButton);

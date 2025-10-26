@@ -35,6 +35,51 @@ export class PaymentIntentService {
     };
   }
 
+  async getPaymentIntentsWithMoneyFreezing() {
+    const payments = await stripe.paymentIntents.search({
+      query: 'status:"requires_capture"',
+    });
+
+    return payments.data;
+  }
+
+  async getPaymentIntentById(paymentIntentId: string) {
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    return paymentIntent;
+  }
+
+  async partialCapturePaymentIntent(paymentIntentId: string, amount: number) {
+    const paymentIntent = await stripe.paymentIntents.capture(paymentIntentId, {
+      amount_to_capture: amount,
+    });
+
+    return paymentIntent;
+  }
+
+  async updatePaymentIntent(paymentIntentId: string, body: any) {
+    const paymentIntent = await stripe.paymentIntents.update(
+      paymentIntentId,
+      body,
+    );
+
+    return paymentIntent;
+  }
+
+  async updateAndConfirmPaymentIntent(
+    paymentIntentId: string,
+    paymentMethodId: string,
+  ) {
+    await stripe.paymentIntents.update(paymentIntentId, {
+      payment_method: paymentMethodId,
+    });
+
+    const confirmedPaymentIntent =
+      await stripe.paymentIntents.confirm(paymentIntentId);
+
+    return confirmedPaymentIntent;
+  }
+
   async createPaymentIntentWithMoneyFreezing(body: ICreatePaymentIntentBody) {
     const params = await this.generateCommonPaymentIntentParams(body);
 
@@ -84,7 +129,10 @@ export class PaymentIntentService {
     return {
       amount: await this.calculateTotalAmount(body.line_items),
       currency: 'usd',
-      automatic_payment_methods: { enabled: true },
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never' as any, // added to call stripe.paymentIntents.confirm manually
+      },
       ...(body.customerId && {
         customer: stripeCustomerId,
       }),

@@ -6,12 +6,20 @@ import CustomCheckoutBtn from "@modules/payment/components/CustomCheckoutBtn";
 import SelectUser from "@modules/user/components/SelectUser";
 import PurchaseSubscriptionBtn from "@modules/payment/components/PurchaseSubscriptionBtn";
 import AddPaymentDetailsBtn from "@modules/payment/components/AddPaymentDetailsBtn";
-import GooglePayBtn from "@modules/payment/components/GooglePayBtn";
+import PaymentRequestButton from "@modules/payment/components/PaymentRequestButton";
 import { Button, Card, Col, Steps } from "antd";
 import { useState } from "react";
 import { newOrderStore } from "@modules/product/stores";
 import { observer } from "mobx-react";
 import SelectProductType from "@modules/product/components/SelectProductType";
+import ExpressCheckout from "@modules/payment/components/ExpressCheckout";
+
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
 
 const MainSteps = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -113,8 +121,17 @@ const MainSteps = () => {
                 <CheckoutSession />
                 <CustomCheckoutBtn />
                 <PurchaseSubscriptionBtn />
-                <GooglePayBtn />
-
+                <PaymentRequestButton />
+                <Elements
+                  stripe={stripePromise}
+                  options={{
+                    mode: "payment",
+                    amount: newOrderStore.total * 100,
+                    currency: "usd",
+                  }}
+                >
+                  <ExpressCheckout />
+                </Elements>
                 <div style={{ display: "flex", marginTop: "20px" }}>
                   <Button
                     className={styles.backBtn}

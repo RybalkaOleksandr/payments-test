@@ -29,7 +29,7 @@ const ProductList = () => {
         getQuantityColumn(),
       ]}
       rowKey={({ id }: IProduct) => id}
-      loading={false}
+      loading={productsStore.isLoading}
       dataSource={relevantProducts || []}
       pagination={false}
     />

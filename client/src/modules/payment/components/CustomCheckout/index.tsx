@@ -55,6 +55,7 @@ const CustomCheckout = ({ userData }: IProps) => {
           };
         }),
         userData,
+        customerId: currentUserStore.currentUser?.id,
       },
       onSuccess: async ({ clientSecret }) => {
         if (saveCard && currentUserStore.currentUser) {
