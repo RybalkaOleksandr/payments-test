@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
+    "@paypal/react-paypal-js": "^8.9.2",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.4.0",
     "antd": "^5.25.1",
