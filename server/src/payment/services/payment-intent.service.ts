@@ -66,9 +66,12 @@ export class PaymentIntentService {
     return paymentIntent;
   }
 
-  async updateAndConfirmPaymentIntent(paymentIntentId: string) {
+  async updateAndConfirmPaymentIntent(
+    paymentIntentId: string,
+    paymentMethodId: string,
+  ) {
     await stripe.paymentIntents.update(paymentIntentId, {
-      payment_method: 'pm_1S01Kp4D5GOr0C6a1HbU89tE',
+      payment_method: paymentMethodId,
     });
 
     const confirmedPaymentIntent =
