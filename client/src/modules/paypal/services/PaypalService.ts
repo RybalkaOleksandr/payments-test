@@ -7,7 +7,7 @@ class PayPalService {
 
       return data;
     } catch (error: any) {
-      throw new Error(error.response.data.details);
+      throw new Error(error);
     }
   };
 
@@ -17,7 +17,7 @@ class PayPalService {
 
       return data;
     } catch (error: any) {
-      throw new Error(error.response.data.details);
+      throw new Error(error);
     }
   };
 }
