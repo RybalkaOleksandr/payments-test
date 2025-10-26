@@ -4,8 +4,11 @@ import { paypalService } from "@modules/paypal/services";
 import { capturePayPalOrderStore } from "@modules/paypal/stores";
 import styles from "./styles.module.scss";
 import { newOrderStore } from "@modules/product/stores";
+import { useRouter } from "next/navigation";
 
 const PayPalBtn = () => {
+  const router = useRouter();
+
   const handleCreateOrder = async () => {
     const response = await paypalService.createOrder({
       currencyCode: "USD",
@@ -28,6 +31,9 @@ const PayPalBtn = () => {
             onApprove={async function (data) {
               return capturePayPalOrderStore.execute({
                 data: { orderId: data.orderID },
+                onSuccess: () => {
+                  router.push("/payment-success");
+                },
               });
             }}
           />
