@@ -1,23 +1,47 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { PayPalService } from 'src/paypal/services';
-import { ICreatePaypalOrderBody } from 'src/paypal/types';
+import {
+  ICreatePaypalOrderBody,
+  ICreatePaypalPlanBody,
+  ICreatePaypalProductBody,
+} from 'src/paypal/types';
 
-@Controller()
+@Controller('paypal')
 export class PayPalController {
   constructor(private readonly paypalService: PayPalService) {}
 
-  @Post('paypal/access-token')
+  @Post('access-token')
   async getAccessToken() {
     return this.paypalService.getAccessToken();
   }
 
-  @Post('paypal/orders')
+  @Post('orders')
   async createOrder(@Body() body: ICreatePaypalOrderBody) {
     return this.paypalService.createOrder(body);
   }
 
-  @Post('paypal/orders/:orderId/capture')
+  @Post('orders/:orderId/capture')
   async captureOrder(@Param('orderId') orderId: string) {
     return this.paypalService.captureOrder(orderId);
+  }
+
+  @Get('products')
+  async getProducts() {
+    return this.paypalService.getProducts();
+  }
+
+  @Get('plans')
+  async getPlans() {
+    return this.paypalService.getPlans();
+  }
+
+  @Post('products')
+  async createProduct(@Body() body: ICreatePaypalProductBody) {
+    return this.paypalService.createProduct(body);
+  }
+
+  @Post('plans')
+  async createPlan(@Body() body: ICreatePaypalPlanBody) {
+    return this.paypalService.createPlan(body);
   }
 }

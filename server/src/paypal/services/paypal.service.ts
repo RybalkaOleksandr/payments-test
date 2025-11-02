@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { ICreatePaypalOrderBody, ICreatePaypalOrderResponse } from '../types';
+import {
+  ICreatePaypalOrderBody,
+  ICreatePaypalOrderResponse,
+  ICreatePaypalPlanBody,
+  ICreatePaypalProductBody,
+} from '../types';
 import { randomUUID } from 'crypto';
 
 @Injectable()
@@ -79,5 +84,69 @@ export class PayPalService {
     });
 
     return data.access_token;
+  }
+
+  async getProducts() {
+    const token = await this.getAccessToken();
+    const url = `${this.baseUrl}/v1/catalogs/products`;
+
+    const { data } = await axios({
+      url,
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return data;
+  }
+
+  async getPlans() {
+    const token = await this.getAccessToken();
+    const url = `${this.baseUrl}/v1/billing/plans`;
+
+    const { data } = await axios({
+      url,
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return data;
+  }
+
+  async createProduct(body: ICreatePaypalProductBody) {
+    const token = await this.getAccessToken();
+
+    const { data } = await axios({
+      url: `${this.baseUrl}/v1/catalogs/products`,
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      data: body,
+    });
+
+    return data;
+  }
+
+  async createPlan(body: ICreatePaypalPlanBody) {
+    const token = await this.getAccessToken();
+
+    const { data } = await axios({
+      url: `${this.baseUrl}/v1/billing/plans`,
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      data: body,
+    });
+
+    return data;
   }
 }
