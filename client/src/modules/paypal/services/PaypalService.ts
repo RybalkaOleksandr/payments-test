@@ -1,4 +1,6 @@
+import { IOwnApiOptions } from "@modules/common/types";
 import { ownApi } from "@utils/axios";
+import { getAxiosCacheOptions } from "@utils/axios/getAxiosCacheOptions";
 
 class PayPalService {
   public createOrder = async (params: any): Promise<any> => {
@@ -14,6 +16,18 @@ class PayPalService {
   public captureOrder = async (orderId: string): Promise<any> => {
     try {
       const { data } = await ownApi.post(`paypal/orders/${orderId}/capture`);
+
+      return data;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  };
+
+  public getProducts = async (ownApiOptions?: IOwnApiOptions): Promise<any> => {
+    try {
+      const { data } = await ownApi.get("paypal/full-products", {
+        ...getAxiosCacheOptions(ownApiOptions),
+      });
 
       return data;
     } catch (error: any) {

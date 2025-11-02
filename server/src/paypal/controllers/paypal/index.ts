@@ -50,4 +50,9 @@ export class PayPalController {
   async createSubscription(@Body() body: ICreatePaypalSubscriptionBody) {
     return this.paypalService.createSubscription(body);
   }
+
+  @Get('full-products')
+  async getFullProducts() {
+    return this.paypalService.getFullProducts();
+  }
 }

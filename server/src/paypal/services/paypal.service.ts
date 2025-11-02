@@ -173,4 +173,22 @@ export class PayPalService {
 
     return data;
   }
+
+  async getFullProducts() {
+    const allProducts = await this.getProducts();
+    const allPlans = await this.getPlans();
+
+    const fullProducts = allProducts.products.map((product: any) => {
+      const productPlans = allPlans.plans.filter(
+        (plan: any) => plan.product_id === product.id,
+      );
+
+      return {
+        ...product,
+        plans: productPlans,
+      };
+    });
+
+    return fullProducts;
+  }
 }
