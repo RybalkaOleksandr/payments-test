@@ -2,9 +2,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 20px;
 }
 
 .innerWrapper {
+  width: 400px;
+  margin: 50px 0;
+  padding: 20px;
+  border: 1px dashed black;
+}
+
+.innerWrapper2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 400px;
   margin: 50px 0;
   padding: 20px;

@@ -5,6 +5,7 @@ import { capturePayPalOrderStore } from "@modules/paypal/stores";
 import styles from "./styles.module.scss";
 import { newOrderStore } from "@modules/product/stores";
 import { useRouter } from "next/navigation";
+import { Button } from "antd";
 
 const PayPalBtn = () => {
   const router = useRouter();
@@ -16,6 +17,19 @@ const PayPalBtn = () => {
     });
 
     return response.id;
+  };
+
+  const handleCreateManualOrder = async () => {
+    const response = await paypalService.createOrder({
+      currencyCode: "USD",
+      amount: newOrderStore.total,
+    });
+
+    const approveUrl = response.links.find(
+      (link: any) => link.rel === "approve"
+    )?.href;
+
+    router.push(approveUrl);
   };
 
   return (
@@ -38,6 +52,10 @@ const PayPalBtn = () => {
             }}
           />
         </PayPalScriptProvider>
+      </div>
+
+      <div className={styles.innerWrapper2}>
+        <Button onClick={handleCreateManualOrder}>Create PayPal Order</Button>
       </div>
     </div>
   );

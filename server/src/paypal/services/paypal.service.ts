@@ -31,6 +31,10 @@ export class PayPalService {
             },
           },
         ],
+        application_context: {
+          return_url: `${process.env.SITE_URL}/payment-success`,
+          cancel_url: `${process.env.SITE_URL}/cancel`,
+        },
       }),
     });
 
