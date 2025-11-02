@@ -60,3 +60,18 @@ export interface ICreatePaypalPlanBody {
     inclusive?: boolean;
   };
 }
+
+export interface ICreatePaypalSubscriptionBody {
+  plan_id: string;
+  customer_id?: string;
+  start_time?: string;
+  quantity?: number;
+  application_context: {
+    brand_name?: string;
+    locale?: string;
+    shipping_preference?: string;
+    user_action?: string;
+    return_url?: string;
+    cancel_url?: string;
+  };
+}

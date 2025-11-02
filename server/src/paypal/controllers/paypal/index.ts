@@ -4,6 +4,7 @@ import {
   ICreatePaypalOrderBody,
   ICreatePaypalPlanBody,
   ICreatePaypalProductBody,
+  ICreatePaypalSubscriptionBody,
 } from 'src/paypal/types';
 
 @Controller('paypal')
@@ -43,5 +44,10 @@ export class PayPalController {
   @Post('plans')
   async createPlan(@Body() body: ICreatePaypalPlanBody) {
     return this.paypalService.createPlan(body);
+  }
+
+  @Post('subscriptions')
+  async createSubscription(@Body() body: ICreatePaypalSubscriptionBody) {
+    return this.paypalService.createSubscription(body);
   }
 }

@@ -5,6 +5,7 @@ import {
   ICreatePaypalOrderResponse,
   ICreatePaypalPlanBody,
   ICreatePaypalProductBody,
+  ICreatePaypalSubscriptionBody,
 } from '../types';
 import { randomUUID } from 'crypto';
 
@@ -145,6 +146,29 @@ export class PayPalService {
         'Content-Type': 'application/json',
       },
       data: body,
+    });
+
+    return data;
+  }
+
+  async createSubscription(body: ICreatePaypalSubscriptionBody) {
+    const token = await this.getAccessToken();
+
+    const { data } = await axios({
+      url: `${this.baseUrl}/v1/billing/subscriptions`,
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        ...body,
+        application_context: {
+          ...body.application_context,
+          return_url: `${process.env.SITE_URL}/payment-success`,
+          cancel_url: `${process.env.SITE_URL}/cancel`,
+        },
+      },
     });
 
     return data;
