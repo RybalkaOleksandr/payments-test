@@ -10,7 +10,7 @@ import {
 import { useEffect } from "react";
 import { newOrderStore, productsStore } from "@modules/product/stores";
 
-const ProductList = () => {
+const StripeProductList = () => {
   useEffect(() => {
     productsStore.reload();
   }, []);
@@ -36,4 +36,4 @@ const ProductList = () => {
   );
 };
 
-export default observer(ProductList);
+export default observer(StripeProductList);
