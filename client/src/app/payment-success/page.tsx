@@ -11,14 +11,15 @@ export default function PaymentSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const paypalOrderId = searchParams.get("token");
+  const paypalSubscriptionId = searchParams.get("subscription_id");
 
   useEffect(() => {
-    if (paypalOrderId) {
+    if (paypalOrderId && !paypalSubscriptionId) {
       capturePayPalOrderStore.execute({
         data: { orderId: paypalOrderId },
       });
     }
-  }, [paypalOrderId]);
+  }, [paypalOrderId, paypalSubscriptionId]);
 
   return (
     <div className={styles.wrapper}>

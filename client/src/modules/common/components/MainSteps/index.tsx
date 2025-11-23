@@ -19,7 +19,6 @@ import { loadStripe } from "@stripe/stripe-js";
 import PayPalBtn from "@modules/paypal/components/PayPalBtn";
 import PaypalProductList from "@modules/product/components/PaypalProductList";
 import { OrderProductType } from "@modules/product/enums";
-import PurchasePaypalSubscriptionBtn from "@modules/payment/components/PurchasePaypalSubscriptionBtn";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -134,10 +133,6 @@ const MainSteps = () => {
 
                 {orderProductType === OrderProductType.RECURRING && (
                   <PurchaseSubscriptionBtn />
-                )}
-
-                {orderProductType === OrderProductType.PAYPAL_SUBSCRIPTION && (
-                  <PurchasePaypalSubscriptionBtn />
                 )}
 
                 <PaymentRequestButton />

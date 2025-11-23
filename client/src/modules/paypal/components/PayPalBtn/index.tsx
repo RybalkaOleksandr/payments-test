@@ -42,6 +42,19 @@ const PayPalBtn = () => {
     return response.id;
   };
 
+  const handleCreateManualPaypalSubscription = async () => {
+    const response = await paypalService.createSubscription({
+      planId: newOrderStore.order?.paypalProducts?.[0]?.selectedPlanId ?? "",
+      quantity: newOrderStore.order?.paypalProducts?.[0]?.quantity ?? 1,
+    });
+
+    const approveUrl = response.links.find(
+      (link: any) => link.rel === "approve"
+    )?.href;
+
+    router.push(approveUrl);
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.innerWrapper}>
@@ -77,7 +90,13 @@ const PayPalBtn = () => {
       </div>
 
       <div className={styles.innerWrapper2}>
-        <Button onClick={handleCreateManualOrder}>Create PayPal Order</Button>
+        {newOrderStore.productType === OrderProductType.PAYPAL_SUBSCRIPTION ? (
+          <Button onClick={handleCreateManualPaypalSubscription}>
+            Create PayPal Subscription
+          </Button>
+        ) : (
+          <Button onClick={handleCreateManualOrder}>Create PayPal Order</Button>
+        )}
       </div>
     </div>
   );
