@@ -119,6 +119,22 @@ export class PayPalService {
     return data;
   }
 
+  async getFullPlan(planId: string) {
+    const token = await this.getAccessToken();
+    const url = `${this.baseUrl}/v1/billing/plans/${planId}`;
+
+    const { data } = await axios({
+      url,
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return data;
+  }
+
   async createProduct(body: ICreatePaypalProductBody) {
     const token = await this.getAccessToken();
 
@@ -178,8 +194,12 @@ export class PayPalService {
     const allProducts = await this.getProducts();
     const allPlans = await this.getPlans();
 
+    const allFullPlans = await Promise.all(
+      allPlans.plans.map((plan: any) => this.getFullPlan(plan.id)),
+    );
+
     const fullProducts = allProducts.products.map((product: any) => {
-      const productPlans = allPlans.plans.filter(
+      const productPlans = allFullPlans.filter(
         (plan: any) => plan.product_id === product.id,
       );
 

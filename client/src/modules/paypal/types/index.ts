@@ -13,6 +13,21 @@ export interface IPaypalPlan {
   usage_type: string;
 }
 
+export interface IPaypalFullPlan extends IPaypalPlan {
+  billing_cycles: {
+    frequency: {
+      interval_unit: string;
+      interval_count: number;
+    };
+    pricing_scheme: {
+      fixed_price: {
+        value: string;
+        currency_code: string;
+      };
+    };
+  }[];
+}
+
 export interface IPaypalFullProduct extends IPaypalProduct {
   plans: IPaypalPlan[];
 }
