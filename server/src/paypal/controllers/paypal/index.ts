@@ -60,4 +60,9 @@ export class PayPalController {
   async handleWebhook(@Body() body: any) {
     return this.paypalService.handleWebhook(body);
   }
+
+  @Post('payout')
+  async payout(@Body() body: { email: string; amount: number }) {
+    return this.paypalService.payout(body.email, body.amount);
+  }
 }

@@ -235,4 +235,38 @@ export class PayPalService {
         break;
     }
   }
+
+  async payout(email: string, amount: number) {
+    const token = await this.getAccessToken();
+
+    const body = {
+      sender_batch_header: {
+        sender_batch_id: `batch_${Date.now()}`,
+        email_subject: 'You got a payout!',
+      },
+      items: [
+        {
+          recipient_type: 'EMAIL',
+          receiver: email,
+          amount: { value: amount.toString(), currency: 'USD' },
+          note: 'Test payout',
+          sender_item_id: `item_${Date.now()}`,
+        },
+      ],
+    };
+
+    console.log(body);
+
+    const { data } = await axios({
+      url: `${this.baseUrl}/v1/payments/payouts`,
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      data: body,
+    });
+
+    return data;
+  }
 }
