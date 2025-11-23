@@ -211,4 +211,28 @@ export class PayPalService {
 
     return fullProducts;
   }
+
+  async handleWebhook(body: any) {
+    console.log(body);
+    switch (body.event_type) {
+      case 'BILLING.SUBSCRIPTION.CREATED':
+        // TODO: Handle subscription created
+        break;
+      case 'BILLING.SUBSCRIPTION.ACTIVATED':
+        // TODO: Handle subscription activated
+        break;
+      case 'BILLING.SUBSCRIPTION.CANCELLED':
+        // TODO: Handle subscription cancelled
+        break;
+      case 'BILLING.SUBSCRIPTION.EXPIRED':
+        // TODO: Handle subscription expired
+        break;
+      case 'CHECKOUT.ORDER.APPROVED':
+        // TODO: Handle order approved
+        break;
+      case 'PAYMENT.CAPTURE.COMPLETED':
+        // TODO: Handle payment capture completed
+        break;
+    }
+  }
 }

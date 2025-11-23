@@ -55,4 +55,9 @@ export class PayPalController {
   async getFullProducts() {
     return this.paypalService.getFullProducts();
   }
+
+  @Post('webhook')
+  async handleWebhook(@Body() body: any) {
+    return this.paypalService.handleWebhook(body);
+  }
 }
