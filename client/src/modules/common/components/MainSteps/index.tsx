@@ -19,6 +19,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import PayPalBtn from "@modules/paypal/components/PayPalBtn";
 import PaypalProductList from "@modules/product/components/PaypalProductList";
 import { OrderProductType } from "@modules/product/enums";
+import { useRouter } from "next/navigation";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -26,6 +27,7 @@ const stripePromise = loadStripe(
 
 const MainSteps = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const router = useRouter();
 
   const stepsItems = [
     { title: "User Data (optional)" },
@@ -39,6 +41,10 @@ const MainSteps = () => {
 
   return (
     <div className={styles.wrapper}>
+      <div className={styles.payoutBtn}>
+        <Button onClick={() => router.push("/payout")}>Payout</Button>
+      </div>
+
       <Card title={stepsNode}>
         <Col>
           <div>

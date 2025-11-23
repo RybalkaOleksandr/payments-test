@@ -51,6 +51,16 @@ class PayPalService {
       throw new Error(error);
     }
   };
+
+  public payout = async (email: string, amount: number): Promise<any> => {
+    try {
+      const { data } = await ownApi.post("paypal/payout", { email, amount });
+
+      return data;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  };
 }
 
 export default new PayPalService();
