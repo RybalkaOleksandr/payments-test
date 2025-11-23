@@ -19,6 +19,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import PayPalBtn from "@modules/paypal/components/PayPalBtn";
 import PaypalProductList from "@modules/product/components/PaypalProductList";
 import { OrderProductType } from "@modules/product/enums";
+import PurchasePaypalSubscriptionBtn from "@modules/payment/components/PurchasePaypalSubscriptionBtn";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -35,6 +36,7 @@ const MainSteps = () => {
   ];
 
   const stepsNode = <Steps current={currentStep} items={stepsItems} />;
+  const orderProductType = newOrderStore.productType;
 
   return (
     <div className={styles.wrapper}>
@@ -129,8 +131,17 @@ const MainSteps = () => {
               <>
                 <CheckoutSession />
                 <CustomCheckoutBtn />
-                <PurchaseSubscriptionBtn />
+
+                {orderProductType === OrderProductType.RECURRING && (
+                  <PurchaseSubscriptionBtn />
+                )}
+
+                {orderProductType === OrderProductType.PAYPAL_SUBSCRIPTION && (
+                  <PurchasePaypalSubscriptionBtn />
+                )}
+
                 <PaymentRequestButton />
+
                 <Elements
                   stripe={stripePromise}
                   options={{
@@ -141,7 +152,9 @@ const MainSteps = () => {
                 >
                   <ExpressCheckout />
                 </Elements>
+
                 <PayPalBtn />
+
                 <div style={{ display: "flex", marginTop: "20px" }}>
                   <Button
                     className={styles.backBtn}

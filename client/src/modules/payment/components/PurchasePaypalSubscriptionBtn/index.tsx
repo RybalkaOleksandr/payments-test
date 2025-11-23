@@ -5,7 +5,6 @@ import { observer } from "mobx-react";
 import { createSubscriptionStore } from "../../stores";
 import useModal from "@modules/common/hooks/useModal";
 import PurchaseSubscriptionCardForm from "../PurchaseSubscriptionCardForm";
-import { currentUserStore } from "@modules/user/stores";
 import { newOrderStore } from "@modules/product/stores";
 import { OrderProductType } from "@modules/product/enums";
 
@@ -14,20 +13,20 @@ const PurchaseSubscriptionBtn = () => {
 
   return (
     <>
-      <div className={styles.wrapper}>
-        <div className={styles.subWrapper}>
+      <div className={styles.wrapper2}>
+        <div className={styles.subWrapper2}>
           <div>
             <Button
-              className={styles.subscriptionBtn}
+              className={styles.subscriptionBtn2}
               onClick={() => purchaseSubscriptionModal.setIsVisible(true)}
               loading={createSubscriptionStore.isLoading}
               style={{ marginLeft: "10px" }}
               disabled={
-                !currentUserStore.currentUser ||
-                newOrderStore.productType !== OrderProductType.RECURRING
+                newOrderStore.productType !==
+                OrderProductType.PAYPAL_SUBSCRIPTION
               }
             >
-              Create Subscription
+              Create PayPal Subscription
             </Button>
           </div>
         </div>
