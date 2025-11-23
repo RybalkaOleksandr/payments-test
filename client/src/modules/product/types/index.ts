@@ -1,3 +1,5 @@
+import { IPaypalFullProduct } from "@modules/paypal/types";
+
 export interface IProduct {
   id: number;
   name: string;
@@ -15,8 +17,14 @@ export interface IOrderProduct extends IProduct {
   selectedPriceId: string;
 }
 
+export interface IOrderPaypalProduct extends IPaypalFullProduct {
+  quantity: number;
+  selectedPlanId: string;
+}
+
 export interface INewOrder {
-  products: IOrderProduct[];
+  products?: IOrderProduct[];
+  paypalProducts?: IOrderPaypalProduct[];
 }
 
 export interface ISelectedPrice {

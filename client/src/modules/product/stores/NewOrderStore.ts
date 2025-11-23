@@ -1,6 +1,6 @@
 import { action, observable, makeObservable } from "mobx";
 import { INewOrder } from "../types";
-import { selectedPricesStore } from ".";
+import { selectedPaypalPlanStore, selectedPricesStore } from ".";
 import { OrderProductType } from "../enums";
 
 class NewOrderStore {
@@ -11,8 +11,8 @@ class NewOrderStore {
   public setOrder = (order: INewOrder | null) => {
     this.order = order ? { ...this.order, ...order } : order;
 
-    this.total =
-      this.order?.products.reduce((sum, product) => {
+    const productsTotal =
+      this.order?.products?.reduce((sum, product) => {
         const selectedPrice = selectedPricesStore.selectedPrices.find(
           (price) => price.productId === product.id
         );
@@ -25,6 +25,22 @@ class NewOrderStore {
             product.quantity
         );
       }, 0) || 0;
+
+    const paypalProductsTotal =
+      this.order?.paypalProducts?.reduce((sum, paypalProduct) => {
+        const selectedPlan = selectedPaypalPlanStore.selectedPlans.find(
+          (plan) => plan.product_id === paypalProduct.id
+        );
+        return (
+          sum +
+          paypalProduct.quantity *
+            Number(
+              selectedPlan?.billing_cycles[0].pricing_scheme.fixed_price.value
+            )
+        );
+      }, 0) || 0;
+
+    this.total = productsTotal + paypalProductsTotal;
   };
 
   public clearOrder = () => {

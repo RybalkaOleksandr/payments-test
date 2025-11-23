@@ -29,5 +29,5 @@ export interface IPaypalFullPlan extends IPaypalPlan {
 }
 
 export interface IPaypalFullProduct extends IPaypalProduct {
-  plans: IPaypalPlan[];
+  plans: IPaypalFullPlan[];
 }

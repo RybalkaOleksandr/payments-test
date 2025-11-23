@@ -17,6 +17,8 @@ import ExpressCheckout from "@modules/payment/components/ExpressCheckout";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import PayPalBtn from "@modules/paypal/components/PayPalBtn";
+import PaypalProductList from "@modules/product/components/PaypalProductList";
+import { OrderProductType } from "@modules/product/enums";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -91,7 +93,13 @@ const MainSteps = () => {
 
             {currentStep === 2 && (
               <>
-                <ProductList />
+                {newOrderStore.productType ===
+                OrderProductType.PAYPAL_SUBSCRIPTION ? (
+                  <PaypalProductList />
+                ) : (
+                  <ProductList />
+                )}
+
                 <TotalAmount />
 
                 <div
