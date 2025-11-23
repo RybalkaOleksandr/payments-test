@@ -6,6 +6,7 @@ import styles from "./styles.module.scss";
 import { newOrderStore } from "@modules/product/stores";
 import { useRouter } from "next/navigation";
 import { Button } from "antd";
+import { OrderProductType } from "@modules/product/enums";
 
 const PayPalBtn = () => {
   const router = useRouter();
@@ -32,25 +33,46 @@ const PayPalBtn = () => {
     router.push(approveUrl);
   };
 
+  const handleCreatePaypalSubscription = async () => {
+    const response = await paypalService.createSubscription({
+      planId: newOrderStore.order?.paypalProducts?.[0]?.selectedPlanId ?? "",
+      quantity: newOrderStore.order?.paypalProducts?.[0]?.quantity ?? 1,
+    });
+
+    return response.id;
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.innerWrapper}>
         <PayPalScriptProvider
           options={{
             clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+            vault: true, // required for subscriptions
           }}
         >
-          <PayPalButtons
-            createOrder={handleCreateOrder}
-            onApprove={async function (data) {
-              return capturePayPalOrderStore.execute({
-                data: { orderId: data.orderID },
-                onSuccess: () => {
-                  router.push("/payment-success");
-                },
-              });
-            }}
-          />
+          {newOrderStore.productType ===
+          OrderProductType.PAYPAL_SUBSCRIPTION ? (
+            <PayPalButtons
+              createSubscription={handleCreatePaypalSubscription}
+              onApprove={async function () {
+                router.push("/payment-success");
+              }}
+              style={{ label: "subscribe" }}
+            />
+          ) : (
+            <PayPalButtons
+              createOrder={handleCreateOrder}
+              onApprove={async function (data) {
+                return capturePayPalOrderStore.execute({
+                  data: { orderId: data.orderID },
+                  onSuccess: () => {
+                    router.push("/payment-success");
+                  },
+                });
+              }}
+            />
+          )}
         </PayPalScriptProvider>
       </div>
 
