@@ -27,7 +27,7 @@ const PurchaseSubscriptionBtn = () => {
                 newOrderStore.productType !== OrderProductType.RECURRING
               }
             >
-              Create subscription
+              Create Subscription
             </Button>
           </div>
         </div>

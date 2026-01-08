@@ -5,6 +5,7 @@ import { PaymentModule } from './payment/payment.module';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { PaypalModule } from './paypal/paypal.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     PaymentModule,
     ProductModule,
     UserModule,
+    PaypalModule,
   ],
   controllers: [],
   providers: [],

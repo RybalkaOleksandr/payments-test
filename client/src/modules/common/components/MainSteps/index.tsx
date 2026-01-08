@@ -16,6 +16,10 @@ import ExpressCheckout from "@modules/payment/components/ExpressCheckout";
 
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import PayPalBtn from "@modules/paypal/components/PayPalBtn";
+import PaypalProductList from "@modules/product/components/PaypalProductList";
+import { OrderProductType } from "@modules/product/enums";
+import { useRouter } from "next/navigation";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -23,6 +27,7 @@ const stripePromise = loadStripe(
 
 const MainSteps = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const router = useRouter();
 
   const stepsItems = [
     { title: "User Data (optional)" },
@@ -32,9 +37,14 @@ const MainSteps = () => {
   ];
 
   const stepsNode = <Steps current={currentStep} items={stepsItems} />;
+  const orderProductType = newOrderStore.productType;
 
   return (
     <div className={styles.wrapper}>
+      <div className={styles.payoutBtn}>
+        <Button onClick={() => router.push("/payout")}>Payout</Button>
+      </div>
+
       <Card title={stepsNode}>
         <Col>
           <div>
@@ -90,7 +100,13 @@ const MainSteps = () => {
 
             {currentStep === 2 && (
               <>
-                <ProductList />
+                {newOrderStore.productType ===
+                OrderProductType.PAYPAL_SUBSCRIPTION ? (
+                  <PaypalProductList />
+                ) : (
+                  <ProductList />
+                )}
+
                 <TotalAmount />
 
                 <div
@@ -120,8 +136,13 @@ const MainSteps = () => {
               <>
                 <CheckoutSession />
                 <CustomCheckoutBtn />
-                <PurchaseSubscriptionBtn />
+
+                {orderProductType === OrderProductType.RECURRING && (
+                  <PurchaseSubscriptionBtn />
+                )}
+
                 <PaymentRequestButton />
+
                 <Elements
                   stripe={stripePromise}
                   options={{
@@ -132,6 +153,9 @@ const MainSteps = () => {
                 >
                   <ExpressCheckout />
                 </Elements>
+
+                <PayPalBtn />
+
                 <div style={{ display: "flex", marginTop: "20px" }}>
                   <Button
                     className={styles.backBtn}

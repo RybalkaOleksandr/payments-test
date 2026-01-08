@@ -15,6 +15,10 @@ const SelectProductType = () => {
         options={[
           { label: "One-time", value: OrderProductType.ONE_TIME },
           { label: "Recurring", value: OrderProductType.RECURRING },
+          {
+            label: "PayPal Subscription",
+            value: OrderProductType.PAYPAL_SUBSCRIPTION,
+          },
         ]}
         onChange={(value) => {
           newOrderStore.setProductType(value);

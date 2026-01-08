@@ -1,0 +1,23 @@
+.wrapper {
+  margin: 40px;
+}
+
+.formWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+}
+
+.form {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.backBtn {
+  height: 50px;
+  font-weight: bold;
+  font-size: 20px;
+}
