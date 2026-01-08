@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-// test 2
+// base 2
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
